@@ -1,0 +1,28 @@
+{
+    "name": "asemalalami/laravel-advanced-filter",
+    "description": "Laravel Advanced Filter",
+    "type": "project",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Asem Alalami",
+            "email": "asem.almi@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "autoload": {
+        "psr-4": {
+            "AsemAlalami\\LaravelAdvancedFilter\\": "src"
+        }
+    },
+    "require": {
+        "ext-json": "*"
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "AsemAlalami\\LaravelAdvancedFilter\\AdvancedFilterServiceProvider"
+            ]
+        }
+    }
+}
