@@ -46,6 +46,9 @@ trait Filterable
         return $this;
     }
 
+    /**
+     * @param Operator $operator
+     */
     private function bindOperator(Operator $operator)
     {
         Builder::macro(Operator::getFunction($operator->name), function (...$parameters) use ($operator) {
@@ -62,6 +65,13 @@ trait Filterable
     private function getOperatorsNamespace()
     {
         return __NAMESPACE__ . '\\Operators\\';
+    }
+
+    public function getOperatorFromAliases(string $operatorAlias)
+    {
+        return array_key_exists($operatorAlias, $this->operatorAliases) ?
+            $this->operatorAliases[$operatorAlias] :
+            config('advanced_filter.default_operator', 'Equal');
     }
 
     public function initializeFilterable()

@@ -12,7 +12,7 @@ class SeparatorQueryFormat extends QueryFormat
 
     public function format($filters): FilterRequest
     {
-        $prefix = config('advanced_filter.param_filter_name', 'filter');
+        $prefix = config('advanced_filter.param_filter_name', 'filters');
         $separator = $this->getSeparatorFromFormat($prefix);
 
         $requestFilter = new FilterRequest();

@@ -52,7 +52,7 @@ abstract class QueryFormat
     private static function loadQueryFormat(Request $request)
     {
         $queryFormat = config('advanced_filter.query_format', 'json');
-        $filterName = config('advanced_filter.param_filter_name', 'filter');
+        $filterName = config('advanced_filter.param_filter_name', 'filters');
 
         switch ($queryFormat) {
             case 'json':

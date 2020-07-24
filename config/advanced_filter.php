@@ -35,7 +35,7 @@ return [
 
     'custom_query_format' => null,
 
-    'param_filter_name' => 'filter', // or as prefix in "separate" query format
+    'param_filter_name' => 'filters', // or as prefix in "separate" query format
 
     'param_conjunction_name' => 'conjunction',
 
@@ -51,16 +51,12 @@ return [
 
         'numeric' => ['Equal', 'NotEqual'],
 
+        'date' => ['Equal', 'NotEqual'],
+
+        'datetime' => ['Equal', 'NotEqual'],
+
         'array' => [
 
         ],
-
-        'date' => [
-
-        ],
-
-        'datetime' => [
-
-        ]
     ]
 ];
