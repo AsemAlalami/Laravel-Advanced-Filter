@@ -7,7 +7,7 @@ namespace AsemAlalami\LaravelAdvancedFilter\Operators;
 use AsemAlalami\LaravelAdvancedFilter\Fields\Field;
 use Illuminate\Database\Eloquent\Builder;
 
-class GreaterThan extends Operator
+class GreaterThanOrEqual extends Operator
 {
 
     /**
@@ -21,16 +21,10 @@ class GreaterThan extends Operator
             $castInDB = config('advanced_filter.cast_db_date', false);
 
             if ($castInDB) {
-                return $builder->whereDate($column, '>', $value, $conjunction);
+                return $builder->whereDate($column, '>=', $value, $conjunction);
             }
-
-            $value = $value->endOfDay();
         }
 
-        if ($field->getDatatype() == 'datetime' && $value->second == 0) {
-            $value = $value->endOfMinute();
-        }
-
-        return $builder->where($column, '>', $value, $conjunction);
+        return $builder->where($column, '>=', $value, $conjunction);
     }
 }
