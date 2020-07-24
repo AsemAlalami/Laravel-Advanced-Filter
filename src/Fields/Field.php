@@ -4,6 +4,7 @@
 namespace AsemAlalami\LaravelAdvancedFilter\Fields;
 
 
+use AsemAlalami\LaravelAdvancedFilter\Exceptions\DatatypeNotFound;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 
@@ -53,9 +54,22 @@ class Field
         return array_slice($this->nameExploded, -1)[0];
     }
 
+    /**
+     * @param string|null $datatype
+     *
+     * @return $this
+     * @throws DatatypeNotFound
+     */
     public function setDatatype(?string $datatype)
     {
-        $this->datatype = $datatype;
+        if (!empty($datatype)) {
+            if (in_array($datatype, static::$primitiveDatatypes)) {
+                $this->datatype = $datatype;
+            } else {
+                throw new DatatypeNotFound($datatype);
+            }
+        }
+
 
         return $this;
     }
@@ -69,6 +83,8 @@ class Field
 
     public function getDatatype()
     {
+        // TODO: cache (as static) result to prevent calculate it again
+
         if (empty($this->datatype)) {
             return $this->getFieldCastType($this->name, $this->getModel()->getCasts());
         }
@@ -99,13 +115,5 @@ class Field
         }
 
         return $this->operators;
-    }
-
-    public function getCastedValue($value)
-    {
-        $model = $this->getModel();
-        $model->{$this->getColumn()} = $value;
-
-        return $model->{$this->getColumn()};
     }
 }

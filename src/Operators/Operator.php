@@ -4,16 +4,27 @@
 namespace AsemAlalami\LaravelAdvancedFilter\Operators;
 
 
+use AsemAlalami\LaravelAdvancedFilter\Fields\Field;
 use Illuminate\Database\Eloquent\Builder;
 
 abstract class Operator
 {
     /** @var string $name */
     public $name;
-    /** @var array $aliases Remove it */
-    protected $aliases = [];
+    /** @var array $aliases */
+    public $aliases = [];
 
-    public abstract function apply(Builder $builder, string $field, $value, string $conjunction = 'and'): Builder;
+    /**
+     * The function calls when trying to apply the operator on a field
+     *
+     * @param Builder $builder
+     * @param Field $field
+     * @param $value
+     * @param string $conjunction
+     *
+     * @return Builder
+     */
+    public abstract function apply(Builder $builder, Field $field, $value, string $conjunction = 'and'): Builder;
 
     public static function getFunction($operatorName)
     {

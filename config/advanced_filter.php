@@ -4,6 +4,7 @@ return [
     'operators' => [
         'Equal' => ['=', 'equal'],
         'NotEqual' => ['!=', 'notEqual'],
+        'GreaterThan' => ['>', 'greater'],
     ],
 
     'custom_operators' => [
@@ -58,5 +59,19 @@ return [
         'array' => [
 
         ],
-    ]
+    ],
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Cast date in the database
+    |--------------------------------------------------------------------------
+    |
+    | This options will use "whereDate" function to compare date fields
+    | the default will compare by start/end of day (as between)
+    | this feature for big-data if you have index on the column
+    |
+    | Yes must set it TRUE if your columns type is not "datetime or date"
+    */
+    'cast_db_date' => false,
 ];

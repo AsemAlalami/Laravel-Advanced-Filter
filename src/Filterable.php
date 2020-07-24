@@ -3,6 +3,7 @@
 namespace AsemAlalami\LaravelAdvancedFilter;
 
 use AsemAlalami\LaravelAdvancedFilter\Exceptions\OperatorNotFound;
+use AsemAlalami\LaravelAdvancedFilter\Fields\Field;
 use AsemAlalami\LaravelAdvancedFilter\Operators\Operator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
@@ -52,6 +53,11 @@ trait Filterable
     private function bindOperator(Operator $operator)
     {
         Builder::macro(Operator::getFunction($operator->name), function (...$parameters) use ($operator) {
+            // convert string field to object
+            if (is_string($parameters[0])) {
+                $parameters[0] = new Field($this->getModel(), $parameters[0]);
+            }
+
             array_unshift($parameters, $this);
 
             return $operator->apply(...$parameters);

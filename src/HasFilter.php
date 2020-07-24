@@ -11,7 +11,7 @@ trait HasFilter
 {
     use Filterable, HasFields;
 
-    public abstract function setup();
+    public abstract function setupFilter();
 
     /**
      * Filter By request
@@ -41,12 +41,12 @@ trait HasFilter
                     $builder = $builder->{$function . 'Has'}(
                         $field->getRelation(),
                         function (Builder $builder) use ($field, $value, $operator) {
-                            return $builder->{Operator::getFunction($operator)}($field->getColumn(), $value);
+                            return $builder->{Operator::getFunction($operator)}($field, $value);
                         }
                     );
                 } else {
                     $builder = $builder->{Operator::getFunction($operator)}(
-                        $field->getColumn(),
+                        $field,
                         $value,
                         $filterRequest->getConjunction()
                     );
@@ -57,7 +57,7 @@ trait HasFilter
 
     public function initializeHasFilter()
     {
-        $this->setup();
+        $this->setupFilter();
 
         $this->resolveFields();
     }
