@@ -10,9 +10,9 @@ use Illuminate\Database\Eloquent\Builder;
 abstract class Operator
 {
     /** @var string $name */
-    public $name;
+    protected $name;
     /** @var array $aliases */
-    public $aliases = [];
+    protected $aliases = [];
 
     /**
      * The function calls when trying to apply the operator on a field
@@ -25,6 +25,21 @@ abstract class Operator
      * @return Builder
      */
     public abstract function apply(Builder $builder, Field $field, $value, string $conjunction = 'and'): Builder;
+
+    /**
+     * The function calls when trying to apply the operator on a count field
+     *
+     * @param Builder $builder
+     * @param Field $field
+     * @param $value
+     * @param string $conjunction
+     *
+     * @return Builder
+     */
+    public function applyOnCount(Builder $builder, Field $field, $value, string $conjunction = 'and'): Builder
+    {
+        return $builder;
+    }
 
     public static function getFunction($operatorName)
     {
@@ -41,11 +56,11 @@ abstract class Operator
     public function __get($name)
     {
         if ($name == 'name' && empty($this->name)) {
-            return get_class($this);
+            return class_basename($this);
         }
 
         if ($name == 'aliases' && empty($this->aliases)) {
-            return [mb_strtolower(get_class($this))];
+            return [mb_strtolower(class_basename($this))];
         }
 
         return $this->{$name};

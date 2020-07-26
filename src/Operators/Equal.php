@@ -20,7 +20,7 @@ class Equal extends Operator
             $castInDB = config('advanced_filter.cast_db_date', false);
 
             if ($castInDB) {
-                return $builder->whereDate($column, $value, $conjunction);
+                return $builder->whereDate($column, '=', $value, $conjunction);
             } else {
                 return $builder->where(function (Builder $builder) use ($value, $column) {
                     $builder->where($column, '>=', $value)
@@ -37,6 +37,11 @@ class Equal extends Operator
             }, null, null, $conjunction);
         }
 
-        return $builder->where($column, $value, $conjunction);
+        return $builder->where($column, '=', $value, $conjunction);
+    }
+
+    public function applyOnCount(Builder $builder, Field $field, $value, string $conjunction = 'and'): Builder
+    {
+        return $builder->whereHas($field->getRelation(), $field->countCallback, '=', $value);
     }
 }

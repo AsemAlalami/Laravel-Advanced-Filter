@@ -24,6 +24,8 @@ class Field
     public $alias;
     /** @var false|string[] $nameExploded */
     private $nameExploded;
+    /** @var callable $countCallback */
+    public $countCallback = null;
 
     /**
      * Field constructor.
@@ -41,7 +43,7 @@ class Field
 
     public function isFromRelation()
     {
-        return count($this->nameExploded) > 1;
+        return count($this->nameExploded) > 1 && !$this->isCount();
     }
 
     public function getRelation()
@@ -51,7 +53,12 @@ class Field
 
     public function getColumn()
     {
-        return array_slice($this->nameExploded, -1)[0];
+        return array_slice($this->nameExploded, -1)[0] ?: null;
+    }
+
+    public function isCount()
+    {
+        return is_null($this->getColumn());
     }
 
     /**
@@ -77,6 +84,13 @@ class Field
     public function setOperators($operators)
     {
         $this->operators = Arr::wrap($operators);
+
+        return $this;
+    }
+
+    public function setCountCallback(?callable $callback)
+    {
+        $this->countCallback = $callback;
 
         return $this;
     }

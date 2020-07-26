@@ -4,6 +4,8 @@
 namespace AsemAlalami\LaravelAdvancedFilter\Fields;
 
 
+use Illuminate\Support\Str;
+
 trait HasFields
 {
     /** @var FieldsFactory[] */
@@ -12,6 +14,7 @@ trait HasFields
     protected $fields = [];
     /** @var string[] */
     protected $fieldsAliases = [];
+    protected $countFields = [];
 
     /**
      * @param string $field
@@ -35,6 +38,13 @@ trait HasFields
         $this->fieldsFactories[] = $fieldFactory;
 
         return $fieldFactory;
+    }
+
+    public function addCountField(string $relation, string $alias = null, callable $callback = null)
+    {
+        $field = new Field($this, "{$relation}.", $alias ?: $this->getCountFieldAlias($relation));
+
+        $this->fields[$field->name] = $field->setDatatype('numeric')->setCountCallback($callback);
     }
 
     private function resolveFields()
@@ -66,5 +76,10 @@ trait HasFields
         }
 
         return false;
+    }
+
+    private function getCountFieldAlias(string $relation)
+    {
+        return Str::snake($relation) . '_count';
     }
 }

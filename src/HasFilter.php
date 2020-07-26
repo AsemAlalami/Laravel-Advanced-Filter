@@ -25,7 +25,7 @@ trait HasFilter
         $this->apply($builder, $request);
     }
 
-    public function apply(Builder $builder, $request)
+    private function apply(Builder $builder, $request)
     {
         $filterRequest = FilterRequest::createFromRequest($request);
 

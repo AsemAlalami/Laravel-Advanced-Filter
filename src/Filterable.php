@@ -31,6 +31,10 @@ trait Filterable
         $operators = config('advanced_filter.operators', []);
 
         foreach ($operators ?: [] as $operator => $aliases) {
+            if (is_int($operator)) {
+                $operator = $aliases;
+            }
+
             $operatorClass = $this->getOperatorsNamespace() . $operator; // operator class path
 
             try {
@@ -53,12 +57,21 @@ trait Filterable
     private function bindOperator(Operator $operator)
     {
         Builder::macro(Operator::getFunction($operator->name), function (...$parameters) use ($operator) {
-            // convert string field to object
+            // convert string field to Field class
+            $field = $parameters[0];
             if (is_string($parameters[0])) {
-                $parameters[0] = new Field($this->getModel(), $parameters[0]);
+                $field = new Field($this->getModel(), $field);
+
+                $parameters[0] = $field;
             }
 
+            // push Builder on first index
             array_unshift($parameters, $this);
+
+            // if the field is count, call applyOnCount function
+            if ($field->isCount()) {
+                return $operator->applyOnCount(...$parameters);
+            }
 
             return $operator->apply(...$parameters);
         });

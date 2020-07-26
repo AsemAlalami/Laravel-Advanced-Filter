@@ -5,6 +5,9 @@ return [
         'Equal' => ['=', 'equal'],
         'NotEqual' => ['!=', 'notEqual'],
         'GreaterThan' => ['>', 'greater'],
+        'GreaterThanOrEqual' => ['>=', 'greaterOrEqual'],
+        'LessThan' => ['<', 'less'],
+        'LessThanOrEqual' => ['<=', 'lessOrEqual'],
     ],
 
     'custom_operators' => [

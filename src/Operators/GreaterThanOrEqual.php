@@ -27,4 +27,12 @@ class GreaterThanOrEqual extends Operator
 
         return $builder->where($column, '>=', $value, $conjunction);
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function applyOnCount(Builder $builder, Field $field, $value, string $conjunction = 'and'): Builder
+    {
+        return $builder->whereHas($field->getRelation(), $field->countCallback, '>=', $value);
+    }
 }

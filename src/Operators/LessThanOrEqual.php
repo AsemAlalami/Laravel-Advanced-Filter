@@ -31,4 +31,9 @@ class LessThanOrEqual extends Operator
 
         return $builder->where($column, '<=', $value, $conjunction);
     }
+
+    public function applyOnCount(Builder $builder, Field $field, $value, string $conjunction = 'and'): Builder
+    {
+        return $builder->whereHas($field->getRelation(), $field->countCallback, '<=', $value);
+    }
 }
