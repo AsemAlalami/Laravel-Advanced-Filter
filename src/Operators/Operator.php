@@ -26,6 +26,8 @@ abstract class Operator
      */
     public abstract function apply(Builder $builder, Field $field, $value, string $conjunction = 'and'): Builder;
 
+    public abstract function getSqlOperator(): string;
+
     /**
      * The function calls when trying to apply the operator on a count field
      *
@@ -38,7 +40,47 @@ abstract class Operator
      */
     public function applyOnCount(Builder $builder, Field $field, $value, string $conjunction = 'and'): Builder
     {
-        return $builder;
+        return $builder->has($field->getRelation(), $this->getSqlOperator(), $value, $conjunction, $field->countCallback);
+    }
+
+    /**
+     * The function calls when trying to apply the operator on a custom field
+     *
+     * @param Builder $builder
+     * @param Field $field
+     * @param $value
+     * @param string $conjunction
+     *
+     * @return Builder
+     */
+    public function applyOnCustom(Builder $builder, Field $field, $value, string $conjunction = 'and'): Builder
+    {
+        return $builder->whereRaw("{$field->getColumn()} {$this->getSqlOperator()} ?", [$value], $conjunction);
+    }
+
+    /**
+     * Apply the operator on the field depends on field type
+     *
+     * @param Builder $builder
+     * @param Field $field
+     * @param $value
+     * @param string $conjunction
+     *
+     * @return Builder
+     */
+    public function execute(Builder $builder, Field $field, $value, string $conjunction = 'and'): Builder
+    {
+        // if the field is custom, call applyOnCustom function
+        if ($field->isCustom()) {
+            return $this->applyOnCustom($builder, $field, $value, $conjunction);
+        }
+
+        // if the field is count, call applyOnCount function
+        if ($field->isCount()) {
+            return $this->applyOnCount($builder, $field, $value, $conjunction);
+        }
+
+        return $this->apply($builder, $field, $value, $conjunction);
     }
 
     public static function getFunction($operatorName)

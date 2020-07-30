@@ -26,6 +26,8 @@ class Field
     private $nameExploded;
     /** @var callable $countCallback */
     public $countCallback = null;
+    /** @var string $customSqlRaw */
+    public $customSqlRaw;
 
     /**
      * Field constructor.
@@ -53,12 +55,17 @@ class Field
 
     public function getColumn()
     {
-        return array_slice($this->nameExploded, -1)[0] ?: null;
+        return $this->isCustom() ? $this->customSqlRaw : (array_slice($this->nameExploded, -1)[0] ?: null);
     }
 
     public function isCount()
     {
         return is_null($this->getColumn());
+    }
+
+    public function isCustom()
+    {
+        return !empty($this->customSqlRaw);
     }
 
     /**
@@ -91,6 +98,13 @@ class Field
     public function setCountCallback(?callable $callback)
     {
         $this->countCallback = $callback;
+
+        return $this;
+    }
+
+    public function setCustomSqlRaw(string $sqlRaw)
+    {
+        $this->customSqlRaw = $sqlRaw;
 
         return $this;
     }

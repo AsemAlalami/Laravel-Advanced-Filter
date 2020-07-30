@@ -47,6 +47,15 @@ trait HasFields
         $this->fields[$field->name] = $field->setDatatype('numeric')->setCountCallback($callback);
     }
 
+    public function addCustomField(string $alias, string $sqlRaw)
+    {
+        $field = new Field($this, $alias);
+
+        $this->fields[$field->name] = $field->setCustomSqlRaw($sqlRaw);
+
+        return $field;
+    }
+
     private function resolveFields()
     {
         // add fields from factories to fields

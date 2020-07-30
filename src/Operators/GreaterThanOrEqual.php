@@ -9,7 +9,6 @@ use Illuminate\Database\Eloquent\Builder;
 
 class GreaterThanOrEqual extends Operator
 {
-
     /**
      * @inheritDoc
      */
@@ -28,11 +27,8 @@ class GreaterThanOrEqual extends Operator
         return $builder->where($column, '>=', $value, $conjunction);
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function applyOnCount(Builder $builder, Field $field, $value, string $conjunction = 'and'): Builder
+    public function getSqlOperator(): string
     {
-        return $builder->whereHas($field->getRelation(), $field->countCallback, '>=', $value);
+        return '>=';
     }
 }

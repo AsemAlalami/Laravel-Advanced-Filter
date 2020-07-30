@@ -68,12 +68,7 @@ trait Filterable
             // push Builder on first index
             array_unshift($parameters, $this);
 
-            // if the field is count, call applyOnCount function
-            if ($field->isCount()) {
-                return $operator->applyOnCount(...$parameters);
-            }
-
-            return $operator->apply(...$parameters);
+            return $operator->execute(...$parameters);
         });
 
         foreach ($operator->aliases as $alias) {

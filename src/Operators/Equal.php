@@ -10,8 +10,6 @@ use Illuminate\Database\Eloquent\Builder;
 
 class Equal extends Operator
 {
-    public $name = 'Equal';
-
     public function apply(Builder $builder, Field $field, $value, string $conjunction = 'and'): Builder
     {
         $column = $field->getColumn();
@@ -40,8 +38,8 @@ class Equal extends Operator
         return $builder->where($column, '=', $value, $conjunction);
     }
 
-    public function applyOnCount(Builder $builder, Field $field, $value, string $conjunction = 'and'): Builder
+    public function getSqlOperator(): string
     {
-        return $builder->whereHas($field->getRelation(), $field->countCallback, '=', $value);
+        return '=';
     }
 }
