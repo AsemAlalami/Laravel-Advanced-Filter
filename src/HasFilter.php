@@ -2,11 +2,19 @@
 
 namespace AsemAlalami\LaravelAdvancedFilter;
 
+use AsemAlalami\LaravelAdvancedFilter\Fields\Field;
 use AsemAlalami\LaravelAdvancedFilter\Fields\HasFields;
 use AsemAlalami\LaravelAdvancedFilter\Operators\Operator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 
+/**
+ * Trait HasFilter
+ * @package AsemAlalami\LaravelAdvancedFilter
+ *
+ * @method Builder|$this filter(Request|array $request = null, Filter $filter = null)
+ * @see HasFilter::scopeFilter
+ */
 trait HasFilter
 {
     use Filterable, HasFields;
@@ -19,15 +27,26 @@ trait HasFilter
      * @param Builder $builder
      * @param Request|array|null $request
      * @param Filter|null $filter
+     *
+     * @return Builder
      */
     public function scopeFilter(Builder $builder, $request = null, Filter $filter = null)
     {
-        $this->apply($builder, $request);
+        return $this->apply($builder, $request);
     }
 
+    /**
+     * Filter fields from request
+     *
+     * @param Builder $builder
+     * @param $request
+     *
+     * @return Builder
+     */
     private function apply(Builder $builder, $request)
     {
         $filterRequest = FilterRequest::createFromRequest($request);
+        $conjunction = $filterRequest->getConjunction();
 
         foreach ($filterRequest->getFilters() as $filter) {
             if ($field = $this->getFilterableField($filter['field'])) {
@@ -35,24 +54,49 @@ trait HasFilter
                 $operator = $this->getOperatorFromAliases($filter['operator']);
                 $value = $field->getCastedValue($filter['value']);
 
+                // apply filter inside relation if the field from relation
                 if ($field->isFromRelation()) {
-                    $function = $filterRequest->getConjunction() == 'and' ? 'where' : 'orWhere';
-
-                    $builder = $builder->{$function . 'Has'}(
-                        $field->getRelation(),
-                        function (Builder $builder) use ($field, $value, $operator) {
-                            return $builder->{Operator::getFunction($operator)}($field, $value);
-                        }
-                    );
+                    // apply on custom scope if the relation has scope
+                    if ($builder->hasNamedScope($field->getScopeRelationFunctionName())) {
+                        $builder = $builder->{$field->getScopeRelationFunctionName()}($field, $operator, $value, $conjunction);
+                    } else {
+                        $builder = $builder->has($field->getRelation(), '>=', 1, $conjunction,
+                            function (Builder $builder) use ($field, $value, $operator) {
+                                return $this->filterField($builder, $field, $operator, $value);
+                            }
+                        );
+                    }
                 } else {
-                    $builder = $builder->{Operator::getFunction($operator)}(
-                        $field,
-                        $value,
-                        $filterRequest->getConjunction()
-                    );
+                    // apply on field
+                    $builder = $this->filterField($builder, $field, $operator, $value, $conjunction);
                 }
             }
         }
+
+        return $builder;
+    }
+
+    /**
+     * Filter field
+     *
+     * check if the field has a custom scope and apply it
+     *
+     * @param Builder $builder
+     * @param Field $field
+     * @param $operator
+     * @param $value
+     * @param string $conjunction
+     *
+     * @return mixed
+     */
+    private function filterField(Builder $builder, Field $field, $operator, $value, $conjunction = 'and')
+    {
+        // apply on custom scope if the field has scope
+        if ($builder->hasNamedScope($field->getScopeFunctionName())) {
+            return $builder->{$field->getScopeFunctionName()}($field, $operator, $value, $conjunction);
+        }
+
+        return $builder->{Operator::getFunction($operator)}($field, $value, $conjunction);
     }
 
     public function initializeHasFilter()

@@ -6,22 +6,19 @@ use AsemAlalami\LaravelAdvancedFilter\Exceptions\OperatorNotFound;
 use AsemAlalami\LaravelAdvancedFilter\Fields\Field;
 use AsemAlalami\LaravelAdvancedFilter\Operators\Operator;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 
 /**
  * Trait Filterable
  * @package AsemAlalami\LaravelAdvancedFilter
  *
- * @method Builder|$this filter(Request|array $request = null, Filter $filter = null)
- * @see Filterable::scopeFilter
  */
 trait Filterable
 {
     protected $operatorAliases = [];
 
     /**
-     * Bind operators
+     * Bind operators to Build
      *
      * @return $this
      * @throws OperatorNotFound
@@ -35,7 +32,7 @@ trait Filterable
                 $operator = $aliases;
             }
 
-            $operatorClass = $this->getOperatorsNamespace() . $operator; // operator class path
+            $operatorClass = $this->getOperatorsNamespace() . $operator; // class path of the operator
 
             try {
                 /** @var Operator $operator */
@@ -52,10 +49,18 @@ trait Filterable
     }
 
     /**
+     * Bind operators to Build by using macros
+     *
      * @param Operator $operator
      */
     private function bindOperator(Operator $operator)
     {
+        // macro to apply operator of field
+        // TODO: maybe from config
+        Builder::macro('applyOperator', function (string $operator, $field, $value, string $conjunction = 'and') {
+            return $this->{Operator::getFunction($operator)}($field, $value, $conjunction);
+        });
+
         Builder::macro(Operator::getFunction($operator->name), function (...$parameters) use ($operator) {
             // convert string field to Field class
             $field = $parameters[0];
@@ -76,11 +81,25 @@ trait Filterable
         }
     }
 
+    /**
+     * Get default operators namespace
+     *
+     * @return string
+     */
     private function getOperatorsNamespace()
     {
         return __NAMESPACE__ . '\\Operators\\';
     }
 
+    /**
+     * Get the operator name from operator alias
+     *
+     * if the alias does not exists it will return the default operator from config file
+     *
+     * @param string $operatorAlias
+     *
+     * @return string
+     */
     public function getOperatorFromAliases(string $operatorAlias)
     {
         return array_key_exists($operatorAlias, $this->operatorAliases) ?

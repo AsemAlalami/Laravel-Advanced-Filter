@@ -77,4 +77,6 @@ return [
     | Yes must set it TRUE if your columns type is not "datetime or date"
     */
     'cast_db_date' => false,
+
+    'prefix_scope_function' => 'where'
 ];

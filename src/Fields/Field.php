@@ -7,6 +7,7 @@ namespace AsemAlalami\LaravelAdvancedFilter\Fields;
 use AsemAlalami\LaravelAdvancedFilter\Exceptions\DatatypeNotFound;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 
 class Field
 {
@@ -143,5 +144,21 @@ class Field
         }
 
         return $this->operators;
+    }
+
+    public function getScopeFunctionName()
+    {
+        $prefix = config('advanced_filter.prefix_scope_function', 'where');
+        $column = ucfirst(Str::camel($this->getColumn()));
+
+        return "{$prefix}{$column}";
+    }
+
+    public function getScopeRelationFunctionName()
+    {
+        $prefix = config('advanced_filter.prefix_scope_function', 'where');
+        $relation = ucfirst(Str::camel(str_replace('.', '_', $this->getRelation())));
+
+        return "{$prefix}{$relation}";
     }
 }
