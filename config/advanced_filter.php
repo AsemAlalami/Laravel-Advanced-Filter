@@ -29,9 +29,9 @@ return [
     | This format is used when sending request.
     |
     | Supported:
-    |   -  "separate:^"     : filter^name^value=abc&filter^email^operator=equal
-    |   -  "array"          : filter[name][value]=abc&filter[name][operator]=equal
-    |   -  "json" (Default) : filters=[{"field":"name","operator":"equal","value":"abc"}]
+    |   -  "separate:^"     : filters^email^value=abc&filters^email^operator=equal
+    |   -  "array"          : filters[email][value]=abc&filters[email][operator]=equal
+    |   -  "json" (Default) : filters=[{"field":"email","operator":"equal","value":"abc"}]
     |
     */
 
@@ -48,22 +48,6 @@ return [
         'operator' => 'operator',
         'value' => 'value',
     ],
-
-    'data_types' => [
-
-        'string' => ['Equal', 'NotEqual', 'Contains'],
-
-        'numeric' => ['Equal', 'NotEqual'],
-
-        'date' => ['Equal', 'NotEqual'],
-
-        'datetime' => ['Equal', 'NotEqual'],
-
-        'array' => [
-
-        ],
-    ],
-
 
     /*
     |--------------------------------------------------------------------------

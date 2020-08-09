@@ -19,8 +19,6 @@ class Field
     public $name;
     /** @var string $datatype */
     private $datatype;
-    /** @var array $operators */
-    private $operators;
     /** @var string $alias */
     public $alias;
     /** @var false|string[] $nameExploded */
@@ -29,6 +27,8 @@ class Field
     public $countCallback = null;
     /** @var string $customSqlRaw */
     public $customSqlRaw;
+    /** @var array|string[] $exceptOperators */
+    public $exceptOperators;
 
     /**
      * Field constructor.
@@ -89,13 +89,6 @@ class Field
         return $this;
     }
 
-    public function setOperators($operators)
-    {
-        $this->operators = Arr::wrap($operators);
-
-        return $this;
-    }
-
     public function setCountCallback(?callable $callback)
     {
         $this->countCallback = $callback;
@@ -106,6 +99,18 @@ class Field
     public function setCustomSqlRaw(string $sqlRaw)
     {
         $this->customSqlRaw = $sqlRaw;
+
+        return $this;
+    }
+
+    /**
+     * @param array|string|string[] $operators
+     *
+     * @return $this
+     */
+    public function setExceptedOperators($operators)
+    {
+        $this->exceptOperators = Arr::wrap($operators);;
 
         return $this;
     }
@@ -137,13 +142,16 @@ class Field
         return $model;
     }
 
-    public function getOperators()
+    /**
+     * Determined if the operator does not belong to excepted operators
+     *
+     * @param string $operator
+     *
+     * @return bool
+     */
+    public function isAllowedOperator(string $operator)
     {
-        if (empty($this->operators)) {
-            return Arr::wrap(config("advanced_filter.data_types.{$this->getDataType()}"));
-        }
-
-        return $this->operators;
+        return !in_array($operator, $this->exceptOperators);
     }
 
     public function getScopeFunctionName()

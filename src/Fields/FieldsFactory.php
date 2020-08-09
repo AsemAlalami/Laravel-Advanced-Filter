@@ -4,6 +4,7 @@
 namespace AsemAlalami\LaravelAdvancedFilter\Fields;
 
 
+use AsemAlalami\LaravelAdvancedFilter\Exceptions\DatatypeNotFound;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 
@@ -13,12 +14,13 @@ class FieldsFactory
     private $model;
     private $fields = [];
     private $datatype;
-    private $operators;
+    private $exceptedOperators;
 
     /**
      * FieldsFactory constructor.
+     *
      * @param Model $model
-     * @param null $fields
+     * @param string|string[]|null $fields
      */
     public function __construct($model, $fields = null)
     {
@@ -28,7 +30,7 @@ class FieldsFactory
     }
 
     /**
-     * @param array|string $fields
+     * @param string|string[] $fields
      *
      * @return $this
      */
@@ -48,7 +50,7 @@ class FieldsFactory
     }
 
     /**
-     * @param string $datatype
+     * @param string|null $datatype
      *
      * @return FieldsFactory
      */
@@ -60,26 +62,27 @@ class FieldsFactory
     }
 
     /**
-     * @param array|string $operators
+     * @param string|string[] $exceptedOperators
      *
      * @return $this
      */
-    public function setOperators($operators)
+    public function setExceptedOperators($exceptedOperators)
     {
-        $this->operators = Arr::wrap($operators);
+        $this->exceptedOperators = Arr::wrap($exceptedOperators);
 
         return $this;
     }
 
     /**
      * @return Field[]
+     * @throws DatatypeNotFound
      */
     public function getFields()
     {
         $fields = [];
         foreach ($this->fields as $field => $alias) {
             $fields[] = (new Field($this->model, $field, $alias))
-                ->setOperators($this->operators)
+                ->setExceptedOperators($this->exceptedOperators)
                 ->setDatatype($this->datatype);
         }
 

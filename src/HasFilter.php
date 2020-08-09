@@ -54,6 +54,11 @@ trait HasFilter
                 $operator = $this->getOperatorFromAliases($filter['operator']);
                 $value = $field->getCastedValue($filter['value']);
 
+                // don't filter if the operator is in excepted operators
+                if (!$field->isAllowedOperator($operator)) {
+                    continue;
+                }
+
                 // apply filter inside relation if the field from relation
                 if ($field->isFromRelation()) {
                     // apply on custom scope if the relation has scope
