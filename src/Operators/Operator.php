@@ -26,6 +26,11 @@ abstract class Operator
      */
     public abstract function apply(Builder $builder, Field $field, $value, string $conjunction = 'and'): Builder;
 
+    /**
+     * Get the equivalent operator in the SQL
+     *
+     * @return string
+     */
     public abstract function getSqlOperator(): string;
 
     /**
@@ -86,6 +91,7 @@ abstract class Operator
     public static function getFunction($operatorName)
     {
         $prefixOperatorFunction = config('advanced_filter.prefix_operator_function', 'filterWhere');
+        $operatorName = ucfirst($operatorName);
 
         return "{$prefixOperatorFunction}{$operatorName}";
     }

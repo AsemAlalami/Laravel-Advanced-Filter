@@ -88,11 +88,12 @@ Query format is shape of the request, the package support 3 formats, and you can
     ```
     filters^email^value=abc&filters^email^operator=equal
     ```
-  
-If you want to define a new query format:
-- create a new class and extends it from `QueryFormat`: `class YourFormat extends QueryFormat`
+> set the default query format in the config file `query_format` attribute
+
+##### Define a new query format:
+- create a new class and extends it from `QueryFormat`: `class MyFormat extends QueryFormat`
 - implement abstract function `format` that returns `FilterRequest`
-- add class to the config file in `custom_query_format` attribute: `'custom_query_format' => YourFormat::class,`
+- add class to the config file in `custom_query_format` attribute: `'custom_query_format' => MyFormat::class,`
 
 
 ### Fields
@@ -102,6 +103,14 @@ Normal Field options:
 - data-type set from model casts by default, if you want to set custom data-type use `setDatatype`
 - operators, field will accept all operators unless you use `setExceptedOperators` to exclude some operators
 - a relational field, only set field name by `.` separator `channel.name`, `channel.type.name`
+- customize query, you can make a scope for the field to customize filter behavier, scope name must be combined 3 sections :
+    - scope
+    - `prefix_scope_function`value of the key in config file (`where` is the default)
+    - attribute name(or function name)
+    ```php
+    public function scopeWhereEmail(Builder $builder, Field $field, string $operator, $value, $conjunction = 'and')
+    ```
+    > you can customize spacific attribute in relational field by define the scope in the relation model
     
 You can add fields to model by using 4 functions:
 - `addField`(string $field, string $alias = null): default alias same field name
@@ -125,7 +134,23 @@ You can add fields to model by using 4 functions:
     ```
 
 ### Conjunction
+Currently the package support one conjunction between all fields
+`and` | `or`, default conjunction attribute in the config file `default_conjunction`
 
 ### Operators
+The package has a many of operators, and you can define a new operators,
+also the package support customize the operators aliases to send in the request
+- Equal
+- NotEqual
+- GreaterThan
+- GreaterThanOrEqual
+- LessThan
+- LessThanOrEqual
+
+
+##### Define a new Operator:
+- create a new class and extends it from `Operator`: `class MyOperator extends Operator`
+- implement abstract function `apply` and `getSqlOperator` (used as a default sql operator for count and custom field)
+- add the class in the config file in `custom_operators` attribute: `'custom_operators' => [MyOperator::class => ['my-op', '*']],`
 
 ### Config

@@ -54,7 +54,7 @@ abstract class QueryFormat
         $queryFormat = config('advanced_filter.query_format', 'json');
         $filterName = config('advanced_filter.param_filter_name', 'filters');
 
-        switch ($queryFormat) {
+        switch (substr($queryFormat, 0, 9)) {
             case 'json':
                 return (new JsonQueryFormat())->format($request->input($filterName, '[]'));
             case 'separator':

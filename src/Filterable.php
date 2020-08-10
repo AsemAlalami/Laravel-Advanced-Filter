@@ -5,8 +5,10 @@ namespace AsemAlalami\LaravelAdvancedFilter;
 use AsemAlalami\LaravelAdvancedFilter\Exceptions\OperatorNotFound;
 use AsemAlalami\LaravelAdvancedFilter\Fields\Field;
 use AsemAlalami\LaravelAdvancedFilter\Operators\Operator;
+use Error;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Arr;
+use InvalidArgumentException;
 
 /**
  * Trait Filterable
@@ -40,8 +42,35 @@ trait Filterable
                 $operator->setAliases(Arr::wrap($aliases));
 
                 $this->bindOperator($operator);
-            } catch (\Error $exception) {
+            } catch (Error $exception) {
                 throw new OperatorNotFound($operator);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Bind Custom Operators to Builder
+     *
+     * @return $this
+     */
+    private function bindCustomOperators()
+    {
+        $customOperators = config('advanced_filter.custom_operators', []);
+        foreach ($customOperators as $customOperator => $aliases) {
+            if (is_int($customOperator)) {
+                $customOperator = $aliases;
+            }
+
+            /** @var Operator $operator */
+            $operator = new $customOperator;
+            if ($operator instanceof Operator) {
+                $operator->setAliases(Arr::wrap($aliases));
+
+                $this->bindOperator($operator);
+            } else {
+                throw new InvalidArgumentException('Custom operator must be instance of Operator');
             }
         }
 
@@ -110,5 +139,7 @@ trait Filterable
     public function initializeFilterable()
     {
         $this->bindOperators();
+
+        $this->bindCustomOperators();
     }
 }

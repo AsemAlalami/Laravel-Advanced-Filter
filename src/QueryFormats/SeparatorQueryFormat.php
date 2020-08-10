@@ -13,7 +13,7 @@ class SeparatorQueryFormat extends QueryFormat
     public function format($filters): FilterRequest
     {
         $prefix = config('advanced_filter.param_filter_name', 'filters');
-        $separator = $this->getSeparatorFromFormat($prefix);
+        $separator = $this->getSeparatorFromFormat();
 
         $requestFilter = new FilterRequest();
 
@@ -47,12 +47,12 @@ class SeparatorQueryFormat extends QueryFormat
         return $requestFilter;
     }
 
-    private function getSeparatorFromFormat(string $prefix)
+    private function getSeparatorFromFormat()
     {
         $queryFormat = config('advanced_filter.query_format', 'json');
         $defaultSeparator = '^';
 
-        return (explode("{$prefix}:", $queryFormat)[1] ?? $defaultSeparator) ?: $defaultSeparator;
+        return (explode("separator:", $queryFormat)[1] ?? $defaultSeparator) ?: $defaultSeparator;
     }
 
 }
