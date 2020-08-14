@@ -7,7 +7,7 @@ return [
     | Operators
     |--------------------------------------------------------------------------
     |
-    | These the package operators and its aliases
+    | These build-in package operators and its aliases
     | You can customize default aliases, remove any operator
     |
     */
@@ -28,8 +28,7 @@ return [
     |
     | Add your operators here
     |
-    | example:
-    |   operator class and its aliases
+    | example: operator class and its aliases
     |   MyOperator::class => ['my-op', '*']
     |
     */
@@ -58,7 +57,7 @@ return [
     | The operators bound to Builder by using macros
     |
     | example:
-    |   if you want to filter by using an operator
+    |   if you want to filter by GreaterThan operator
     |   $orders->filterWhereGreaterThan('total', 100)
     |
     */
@@ -70,7 +69,7 @@ return [
     | Default Conjunction
     |--------------------------------------------------------------------------
     |
-    | This option used when request send without conjunction
+    | This option used when request sent without conjunction
     |
     | values: and | or
     |
@@ -101,8 +100,8 @@ return [
     |--------------------------------------------------------------------------
     |
     | Add you custom query format here
-    | set this value to set as a default query format of the request
-
+    | this value will set as a default query format of the request
+    |
     | example: MyQueryFormat::class
     |
     */
