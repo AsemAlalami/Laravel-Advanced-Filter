@@ -19,6 +19,14 @@ return [
         'GreaterThanOrEqual' => ['>=', 'greaterOrEqual'],
         'LessThan' => ['<', 'less'],
         'LessThanOrEqual' => ['<=', 'lessOrEqual'],
+        'In' => ['|', 'in'],
+        'NotIn' => ['!|', 'notIn'],
+        'Contains' => ['*', 'contains'],
+        'NotContains' => ['!*', 'notContains'],
+        'StartsWith' => ['^', 'startsWith'],
+        'NotStartsWith' => ['!^', 'notStartsWith'],
+        'EndsWith' => ['$', 'endsWith'],
+        'NotEndsWith' => ['!$', 'notEndsWith'],
     ],
 
     /*
@@ -86,7 +94,7 @@ return [
     | This format is used when sending request.
     |
     | Supported:
-    |   -  "separate:^"     : filters^email^value=abc&filters^email^operator=equal
+    |   -  "separator:^"    : filters^email^value=abc&filters^email^operator=equal
     |   -  "array"          : filters[email][value]=abc&filters[email][operator]=equal
     |   -  "json" (Default) : filters=[{"field":"email","operator":"equal","value":"abc"}]
     |
@@ -155,5 +163,16 @@ return [
     |
     */
 
-    'prefix_scope_function' => 'where'
+    'prefix_scope_function' => 'where',
+
+    /*
+    |--------------------------------------------------------------------------
+    | Empty Value As NULL
+    |--------------------------------------------------------------------------
+    |
+    | This option used when you want to considered empty value as NULL
+    |
+    */
+
+    'empty_as_null' => false,
 ];

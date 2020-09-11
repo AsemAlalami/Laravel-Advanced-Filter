@@ -7,7 +7,7 @@ namespace AsemAlalami\LaravelAdvancedFilter\Exceptions;
 use AsemAlalami\LaravelAdvancedFilter\Fields\FieldCast;
 use Exception;
 
-class DatatypeNotFound extends Exception
+class DatatypeNotFoundException extends Exception
 {
     public function __construct(string $datatype)
     {

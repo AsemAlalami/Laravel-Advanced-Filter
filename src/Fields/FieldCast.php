@@ -79,8 +79,13 @@ trait FieldCast
 
     public function getCastedValue($value)
     {
-        if (is_null($value)) {
+        if (is_null($value) || is_array($value)) {
             return $value;
+        }
+
+        // return null if the value is empty and "empty_as_null" config value is true
+        if (config('advanced_filter.empty_as_null', false) && empty($value)) {
+            return null;
         }
 
         switch ($this->getDatatype()) {

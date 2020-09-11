@@ -4,7 +4,7 @@
 namespace AsemAlalami\LaravelAdvancedFilter\Fields;
 
 
-use AsemAlalami\LaravelAdvancedFilter\Exceptions\DatatypeNotFound;
+use AsemAlalami\LaravelAdvancedFilter\Exceptions\DatatypeNotFoundException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
@@ -28,7 +28,7 @@ class Field
     /** @var string $customSqlRaw */
     public $customSqlRaw;
     /** @var array|string[] $exceptOperators */
-    public $exceptOperators;
+    public $exceptOperators = [];
 
     /**
      * Field constructor.
@@ -73,7 +73,7 @@ class Field
      * @param string|null $datatype
      *
      * @return $this
-     * @throws DatatypeNotFound
+     * @throws DatatypeNotFoundException
      */
     public function setDatatype(?string $datatype)
     {
@@ -81,7 +81,7 @@ class Field
             if (in_array($datatype, static::$primitiveDatatypes)) {
                 $this->datatype = $datatype;
             } else {
-                throw new DatatypeNotFound($datatype);
+                throw new DatatypeNotFoundException($datatype);
             }
         }
 
@@ -110,7 +110,7 @@ class Field
      */
     public function setExceptedOperators($operators)
     {
-        $this->exceptOperators = Arr::wrap($operators);;
+        $this->exceptOperators = Arr::wrap($operators);
 
         return $this;
     }

@@ -6,7 +6,7 @@ namespace AsemAlalami\LaravelAdvancedFilter\Exceptions;
 
 use Exception;
 
-class OperatorNotFound extends Exception
+class OperatorNotFoundException extends Exception
 {
     public function __construct(string $operator)
     {

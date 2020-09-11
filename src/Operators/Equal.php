@@ -10,32 +10,33 @@ use Illuminate\Database\Eloquent\Builder;
 
 class Equal extends Operator
 {
+    /**
+     * @inheritDoc
+     * @param Carbon $value
+     */
     public function apply(Builder $builder, Field $field, $value, string $conjunction = 'and'): Builder
     {
-        $column = $field->getColumn();
+        if (is_null($value)) {
+            return $builder->whereNull($field->getColumn(), $conjunction);
+        }
 
         if ($field->getDatatype() == 'date') {
             $castInDB = config('advanced_filter.cast_db_date', false);
 
             if ($castInDB) {
-                return $builder->whereDate($column, '=', $value, $conjunction);
+                return $builder->whereDate($field->getColumn(), $this->getSqlOperator(), $value, $conjunction);
             } else {
-                return $builder->where(function (Builder $builder) use ($value, $column) {
-                    $builder->where($column, '>=', $value)
-                        ->where($column, '<=', $value->clone()->endOfDay());
-                }, null, null, $conjunction);
+                return $builder->whereBetween($field->getColumn(), [$value, $value->clone()->endOfDay()], $conjunction);
             }
         }
 
-        /** @var Carbon $value */
         if ($field->getDatatype() == 'datetime' && $value->second == 0) {
-            return $builder->where(function (Builder $builder) use ($value, $column) {
-                $builder->where($column, '>=', $value->startOfMinute())
-                    ->where($column, '<=', $value->clone()->endOfMinute());
-            }, null, null, $conjunction);
+            $value = [$value->startOfMinute(), $value->clone()->endOfMinute()];
+
+            return $builder->whereBetween($field->getColumn(), $value, $conjunction);
         }
 
-        return $builder->where($column, '=', $value, $conjunction);
+        return $builder->where($field->getColumn(), $this->getSqlOperator(), $value, $conjunction);
     }
 
     public function getSqlOperator(): string

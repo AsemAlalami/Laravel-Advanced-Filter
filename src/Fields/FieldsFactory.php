@@ -4,7 +4,7 @@
 namespace AsemAlalami\LaravelAdvancedFilter\Fields;
 
 
-use AsemAlalami\LaravelAdvancedFilter\Exceptions\DatatypeNotFound;
+use AsemAlalami\LaravelAdvancedFilter\Exceptions\DatatypeNotFoundException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 
@@ -75,7 +75,7 @@ class FieldsFactory
 
     /**
      * @return Field[]
-     * @throws DatatypeNotFound
+     * @throws DatatypeNotFoundException
      */
     public function getFields()
     {

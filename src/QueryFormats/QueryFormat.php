@@ -9,6 +9,10 @@ use Illuminate\Http\Request;
 
 abstract class QueryFormat
 {
+    const QUERY_FORMAT_JSON = 'json';
+    const QUERY_FORMAT_ARRAY = 'array';
+    const QUERY_FORMAT_SEPARATOR = 'separator';
+
     /** @var array $fieldParams */
     public $fieldParams;
     /** @var string $defaultOperator */
@@ -51,18 +55,22 @@ abstract class QueryFormat
 
     private static function loadQueryFormat(Request $request)
     {
-        $queryFormat = config('advanced_filter.query_format', 'json');
         $filterName = config('advanced_filter.param_filter_name', 'filters');
 
-        switch (substr($queryFormat, 0, 9)) {
-            case 'json':
+        switch (static::getQueryFormat()) {
+            case self::QUERY_FORMAT_JSON:
                 return (new JsonQueryFormat())->format($request->input($filterName, '[]'));
-            case 'separator':
+            case self::QUERY_FORMAT_SEPARATOR:
                 return (new SeparatorQueryFormat())->format($request->all());
-            case 'array':
+            case self::QUERY_FORMAT_ARRAY:
                 return (new ArrayQueryFormat())->format($request->input($filterName, []));
         }
 
         throw new \InvalidArgumentException('must be a valid query format');
+    }
+
+    public static function getQueryFormat()
+    {
+        return substr(config('advanced_filter.query_format', self::QUERY_FORMAT_JSON), 0, 9);
     }
 }

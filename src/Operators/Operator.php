@@ -7,13 +7,15 @@ namespace AsemAlalami\LaravelAdvancedFilter\Operators;
 use AsemAlalami\LaravelAdvancedFilter\Fields\Field;
 use Illuminate\Database\Eloquent\Builder;
 
+/**
+ * Class Operator
+ * @package AsemAlalami\LaravelAdvancedFilter\Operators
+ *
+ * @property string $name
+ * @property array $aliases
+ */
 abstract class Operator
 {
-    /** @var string $name */
-    protected $name;
-    /** @var array $aliases */
-    protected $aliases = [];
-
     /**
      * The function calls when trying to apply the operator on a field
      *
@@ -60,7 +62,9 @@ abstract class Operator
      */
     public function applyOnCustom(Builder $builder, Field $field, $value, string $conjunction = 'and'): Builder
     {
-        return $builder->whereRaw("{$field->getColumn()} {$this->getSqlOperator()} ?", [$value], $conjunction);
+        $sql = "{$field->getColumn()} {$this->getSqlOperator()} {$this->getSqlValue($value)}";
+
+        return $builder->whereRaw($sql, [], $conjunction);
     }
 
     /**
@@ -86,6 +90,11 @@ abstract class Operator
         }
 
         return $this->apply($builder, $field, $value, $conjunction);
+    }
+
+    protected function getSqlValue($value)
+    {
+        return $value;
     }
 
     public static function getFunction($operatorName)

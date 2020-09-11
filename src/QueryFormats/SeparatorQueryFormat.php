@@ -29,9 +29,9 @@ class SeparatorQueryFormat extends QueryFormat
                     }
 
                     if ($paramExploded[2] == $this->fieldParams['operator']) {
-                        $filter[$fieldName]['operator'] = $paramName;
+                        $filter[$fieldName]['operator'] = $paramValue;
                     } elseif ($paramExploded[2] == $this->fieldParams['value']) {
-                        $filter[$fieldName]['value'] = $paramName;
+                        $filter[$fieldName]['value'] = $paramValue;
                     }
                 }
             }

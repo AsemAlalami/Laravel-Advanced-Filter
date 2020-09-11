@@ -2,7 +2,7 @@
 
 namespace AsemAlalami\LaravelAdvancedFilter;
 
-use AsemAlalami\LaravelAdvancedFilter\Exceptions\OperatorNotFound;
+use AsemAlalami\LaravelAdvancedFilter\Exceptions\OperatorNotFoundException;
 use AsemAlalami\LaravelAdvancedFilter\Fields\Field;
 use AsemAlalami\LaravelAdvancedFilter\Operators\Operator;
 use Error;
@@ -23,7 +23,7 @@ trait Filterable
      * Bind operators to Build
      *
      * @return $this
-     * @throws OperatorNotFound
+     * @throws OperatorNotFoundException
      */
     private function bindOperators()
     {
@@ -43,7 +43,7 @@ trait Filterable
 
                 $this->bindOperator($operator);
             } catch (Error $exception) {
-                throw new OperatorNotFound($operator);
+                throw new OperatorNotFoundException($operator);
             }
         }
 
