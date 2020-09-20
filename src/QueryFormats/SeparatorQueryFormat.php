@@ -15,36 +15,20 @@ class SeparatorQueryFormat extends QueryFormat
         $prefix = config('advanced_filter.param_filter_name', 'filters');
         $separator = $this->getSeparatorFromFormat();
 
-        $requestFilter = new FilterRequest();
-
-        $filter = [];
+        // convert string parameters to array
+        $parameters = [];
         foreach ($filters as $paramName => $paramValue) {
             if (Str::startsWith($paramName, "{$prefix}{$separator}")) {
-                $paramExploded = explode($separator, $paramName);
+                $stringArray = $this->stringBySeparatorToStringArray($paramName, $separator);
+                $stringArray .= "={$paramValue}"; // add the parameter value
+                parse_str($stringArray, $filter); // parse to array
 
-                $fieldName = $paramExploded[1] ?? null;
-                if ($fieldName) {
-                    if (!isset($filter[$fieldName])) {
-                        $filter[$fieldName] = [];
-                    }
-
-                    if ($paramExploded[2] == $this->fieldParams['operator']) {
-                        $filter[$fieldName]['operator'] = $paramValue;
-                    } elseif ($paramExploded[2] == $this->fieldParams['value']) {
-                        $filter[$fieldName]['value'] = $paramValue;
-                    }
-                }
+                $parameters = array_merge_recursive($parameters, $filter);
             }
         }
 
-        foreach ($filter as $fieldName => $item) {
-            $operator = empty($item['operator']) ? $this->defaultOperator : $item['operator'];
-            $value = $item['value'] ?? null;
-
-            $requestFilter->addFilter($fieldName, $operator, $value);
-        }
-
-        return $requestFilter;
+        // use ArrayQueryFormat
+        return (new ArrayQueryFormat())->format($parameters[$prefix]);
     }
 
     private function getSeparatorFromFormat()
@@ -53,6 +37,28 @@ class SeparatorQueryFormat extends QueryFormat
         $defaultSeparator = '^';
 
         return (explode("separator:", $queryFormat)[1] ?? $defaultSeparator) ?: $defaultSeparator;
+    }
+
+    /**
+     * Convert string separated to string array
+     *
+     * @param string $string
+     * @param string $separator
+     *
+     * @return string
+     */
+    private function stringBySeparatorToStringArray(string $string, string $separator)
+    {
+        $stringArray = '';
+        foreach (explode($separator, $string) as $index => $item) {
+            if ($index == 0) {
+                $stringArray .= "{$item}";
+            } else {
+                $stringArray .= "[{$item}]";
+            }
+        }
+
+        return $stringArray;
     }
 
 }

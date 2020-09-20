@@ -37,10 +37,6 @@ class In extends Operator
 
     protected function getSqlValue($value)
     {
-        if (QueryFormat::getQueryFormat() == QueryFormat::QUERY_FORMAT_SEPARATOR) {
-            $value = is_array($value) ? $value : explode(',', $value);
-        }
-
         return Arr::wrap($value);
     }
 
