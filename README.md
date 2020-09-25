@@ -100,13 +100,17 @@ Query format is shape of the request, the package support 3 formats, and you can
 Normal Field options:
 - field name is the column name
 - alias is the key that you want to send it in the request
-- data-type set from model casts by default, if you want to set custom data-type use `setDatatype`
+- data-type set from model `casts` by default, if you want to set custom data-type use `setDatatype`
 - operators, field will accept all operators unless you use `setExceptedOperators` to exclude some operators
 - a relational field, only set field name by `.` separator `channel.name`, `channel.type.name`
-- customize query, you can make a scope for the field to customize filter behavier, scope name must be combined 3 sections :
+    > you can define field by `.` separator, but consider it as a non relational field by assign `false` for `inRelation` parameter
+    ```php 
+    $this->addField('channels.name', 'channel_name', false);
+    ```
+- customize a query, you can make a scope for the field to customize a filter behavior, scope name must be combined 3 sections :
     - scope
     - `prefix_scope_function`value of the key in config file (`where` is the default)
-    - attribute name(or function name)
+    - attribute name(or relation name) for example `email`
     ```php
     public function scopeWhereEmail(Builder $builder, Field $field, string $operator, $value, $conjunction = 'and')
     ```
@@ -115,7 +119,7 @@ Normal Field options:
     > you can use `applyOperator` function to use default behavior `$builder->applyOperator($operator, $field, $value, $conjunction);`
     
 You can add fields to model by using 4 functions:
-- `addField`(string $field, string $alias = null): default alias same field name
+- `addField`(string $field, string $alias = null, ?bool $inRelation = null): default alias same field name
     ```php
     $this->addField('total')->setDatatype('numeric');
     ```
@@ -130,9 +134,10 @@ You can add fields to model by using 4 functions:
         $builder->where('quantity', '>', 1);
     });
     ```
-- `addCustomField`(string $alias, string $sqlRaw): add a field from raw sql query
+- `addCustomField`(string $alias, string $sqlRaw, $relation = null): add a field from raw sql query
     ```php
     $this->addCustomField('my_total', '(`shipping_cost` + `subtotal`)');
+    $this->addCustomField('line_subtotal', '(`price` + `quantity`)', 'orderLineItems');
     ```
 
 ### Conjunction

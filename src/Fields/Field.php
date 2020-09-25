@@ -29,24 +29,35 @@ class Field
     public $customSqlRaw;
     /** @var array|string[] $exceptOperators */
     public $exceptOperators = [];
+    private $isFromRelation = null;
 
     /**
      * Field constructor.
      * @param Model $model
      * @param string $name
-     * @param string $alias
+     * @param string|null $alias
+     * @param bool|null $isFromRelation
      */
-    public function __construct($model, string $name, string $alias = null)
+    public function __construct($model, string $name, string $alias = null, ?bool $isFromRelation = null)
     {
         $this->model = $model;
         $this->name = $name;
         $this->alias = $alias ?: $name;
+        $this->isFromRelation = $isFromRelation;
         $this->nameExploded = explode('.', $this->name);
     }
 
     public function isFromRelation()
     {
-        return count($this->nameExploded) > 1 && !$this->isCount();
+        return $this->isFromRelation === null ? (count($this->nameExploded) > 1 && !$this->isCount()) : $this->isFromRelation;
+    }
+
+    /**
+     * @param bool|null $isFromRelation
+     */
+    public function setIsFromRelation(?bool $isFromRelation): void
+    {
+        $this->isFromRelation = $isFromRelation;
     }
 
     public function getRelation()

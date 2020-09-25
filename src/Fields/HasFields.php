@@ -18,13 +18,14 @@ trait HasFields
 
     /**
      * @param string $field
-     * @param string $alias
+     * @param string|null $alias
+     * @param bool|null $inRelation
      *
      * @return Field
      */
-    public function addField(string $field, string $alias = null)
+    public function addField(string $field, string $alias = null, ?bool $inRelation = null)
     {
-        $field = new Field($this, $field, $alias);
+        $field = new Field($this, $field, $alias, $inRelation);
 
         $this->fields[$field->name] = $field;
 
@@ -47,9 +48,9 @@ trait HasFields
         $this->fields[$field->name] = $field->setDatatype('numeric')->setCountCallback($callback);
     }
 
-    public function addCustomField(string $alias, string $sqlRaw)
+    public function addCustomField(string $alias, string $sqlRaw, $relation = null)
     {
-        $field = new Field($this, $alias);
+        $field = new Field($this, $relation ? "{$relation}.{$alias}" : $alias, $alias);
 
         $this->fields[$field->name] = $field->setCustomSqlRaw($sqlRaw);
 

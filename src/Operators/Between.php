@@ -5,9 +5,7 @@ namespace AsemAlalami\LaravelAdvancedFilter\Operators;
 
 
 use AsemAlalami\LaravelAdvancedFilter\Fields\Field;
-use AsemAlalami\LaravelAdvancedFilter\QueryFormats\QueryFormat;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Arr;
 use InvalidArgumentException;
 
 class Between extends Operator
