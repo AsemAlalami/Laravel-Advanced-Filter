@@ -32,14 +32,6 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
 
     private function setupDatabase(Builder $schema)
     {
-        $schema->create('users', function (Blueprint $table) {
-            $table->increments('id');
-            $table->string('first_name');
-            $table->string('last_name');
-            $table->string('email');
-            $table->timestamps();
-        });
-
         $schema->create('stores', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
@@ -58,6 +50,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
             $table->unsignedInteger('store_id');
             $table->string('reference');
             $table->dateTime('order_date');
+            $table->dateTime('ship_date')->nullable();
             $table->decimal('subtotal');
             $table->decimal('shipping_cost');
             $table->timestamps();

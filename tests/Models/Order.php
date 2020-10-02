@@ -5,6 +5,7 @@ namespace AsemAlalami\LaravelAdvancedFilter\Test\Models;
 use AsemAlalami\LaravelAdvancedFilter\HasFilter;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
 
 /**
  * Class User
@@ -13,17 +14,21 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $store_id
  * @property string $reference
  * @property Carbon $order_date
+ * @property Carbon|null $ship_date
  * @property float $subtotal
  * @property float $shipping_cost
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
+ *
+ * @property Store $store
+ * @property Collection|OrderLine[] $orderLines
  */
 class Order extends Model
 {
     use HasFilter;
 
     protected $fillable = ['store_id', 'reference', 'order_date', 'subtotal', 'shipping_cost'];
-    protected $casts = ['order_date' => 'datetime'];
+    protected $casts = ['order_date' => 'date', 'ship_date' => 'datetime'];
 
     public function store()
     {
@@ -37,12 +42,13 @@ class Order extends Model
 
     public function setupFilter()
     {
-        $this->addFields(['reference' => 'order_number', 'order_date', 'created_at'])->setDatatype('datetime');
+        $this->addFields(['reference' => 'order_number', 'order_date', 'ship_date', 'created_at']);
         $this->addFields(['subtotal', 'shipping_cost' => 'shipping'])->setDatatype('numeric');
 
         $this->addFields(['store_id', 'store.name' => 'store_name']);
 
         $this->addCountField('orderLines', 'lines_count');
+
         $this->addCustomField('line_subtotal', '(`price` * `quantity`)', 'orderLines');
 
         $this->addField('orderLines.product_id', 'product_id');
