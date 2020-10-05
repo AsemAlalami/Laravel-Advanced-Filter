@@ -50,6 +50,7 @@ class Order extends Model
         $this->addCountField('orderLines', 'lines_count');
 
         $this->addCustomField('line_subtotal', '(`price` * `quantity`)', 'orderLines');
+        $this->addField('orderLines.price', 'line_price');
 
         $this->addField('orderLines.product_id', 'product_id');
         $this->addField('orderLines.product.name', 'product_name');
