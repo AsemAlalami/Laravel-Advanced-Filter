@@ -21,6 +21,10 @@ class In extends Operator
             return $builder;
         }
 
+        if ($field->getDatatype() == 'date') {
+            return $this->applyOnDate($builder, $field, $value, $conjunction);
+        }
+
         // to use in NotIn operator
         $notIn = $this->getSqlOperator() != 'IN';
 
@@ -54,5 +58,15 @@ class In extends Operator
     public function applyOnCount(Builder $builder, Field $field, $value, string $conjunction = 'and'): Builder
     {
         throw new UnsupportedOperatorException($this->name, 'count');
+    }
+
+    private function applyOnDate(Builder $builder, Field $field, $value, string $conjunction = 'and')
+    {
+        // TODO: cast values to Carbon and format it to date
+        $values = $this->getSqlValue($value);
+
+        $bind = implode(',', array_fill(0, count($values), '?'));
+
+        return $builder->whereRaw("DATE(`{$field->getColumn()}`) in ({$bind})", $values, $conjunction);
     }
 }

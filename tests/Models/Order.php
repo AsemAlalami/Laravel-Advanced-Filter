@@ -46,13 +46,15 @@ class Order extends Model
         $this->addFields(['subtotal', 'shipping_cost' => 'shipping'])->setDatatype('numeric');
 
         $this->addFields(['store_id', 'store.name' => 'store_name']);
+        $this->addCustomField('store_reference', '( `stores`.`name` || "-" || `orders`.`reference`)', 'store');
 
         $this->addCountField('orderLines', 'lines_count');
 
-        $this->addCustomField('line_subtotal', '(`price` * `quantity`)', 'orderLines');
+        $this->addCustomField('line_subtotal', '(`price` * `quantity`)', 'orderLines')->setDatatype('numeric');
         $this->addField('orderLines.price', 'line_price');
 
         $this->addField('orderLines.product_id', 'product_id');
         $this->addField('orderLines.product.name', 'product_name');
+        $this->addField('orderLines.product.sku', 'product_sku');
     }
 }

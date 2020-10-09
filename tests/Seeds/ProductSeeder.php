@@ -13,7 +13,7 @@ class ProductSeeder extends Seeder
     {
         Product::create(['name' => 'Nam porttitor scelerisque neque. Nullam', 'sku' => '2971-KW']);
         Product::create(['name' => 'tellus id nunc interdum feugiat.', 'sku' => 'M0E-8H3']);
-        Product::create(['name' => 'magna tellus faucibus leo, in', 'sku' => '64759-40420']);
+        Product::create(['name' => 'magna tellus faucibus leo, libero', 'sku' => '64759-40420']);
         Product::create(['name' => 'eu neque pellentesque massa lobortis', 'sku' => 'L5X-7J3']);
         Product::create(['name' => 'arcu vel quam dignissim pharetra.', 'sku' => 'KU5-8ZD']);
         Product::create(['name' => 'magna. Nam ligula elit, pretium', 'sku' => 'LT5W-9CV']);

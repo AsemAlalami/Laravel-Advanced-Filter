@@ -27,6 +27,7 @@ return [
         'NotStartsWith' => ['!^', 'notStartsWith'],
         'EndsWith' => ['$', 'endsWith'],
         'NotEndsWith' => ['!$', 'notEndsWith'],
+        'Between' => ['><', 'between'],
     ],
 
     /*
