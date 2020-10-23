@@ -6,13 +6,13 @@ use AsemAlalami\LaravelAdvancedFilter\Test\Models\Order;
 use AsemAlalami\LaravelAdvancedFilter\Test\TestCase;
 use Illuminate\Http\Request;
 
-class EqualTest extends TestCase
+class EqualsTest extends TestCase
 {
     /** @test */
     public function it_can_filter_string_fields()
     {
         $reference = 'LAF_0005';
-        $queryFilters = 'filters=[{"field":"order_number","operator":"equal","value":"' . $reference . '"}]';
+        $queryFilters = 'filters=[{"field":"order_number","operator":"equals","value":"' . $reference . '"}]';
         $request = Request::create("test?{$queryFilters}");
 
         $order = Order::filter($request)->first();
@@ -26,7 +26,7 @@ class EqualTest extends TestCase
     public function it_can_filter_numeric_fields()
     {
         $subtotal = 25;
-        $queryFilters = 'filters=[{"field":"subtotal","operator":"equal","value":"' . $subtotal . '"}]';
+        $queryFilters = 'filters=[{"field":"subtotal","operator":"equals","value":"' . $subtotal . '"}]';
         $request = Request::create("test?{$queryFilters}");
 
         $order = Order::filter($request)->first();
@@ -40,7 +40,7 @@ class EqualTest extends TestCase
     public function it_can_filter_date_fields()
     {
         $orderDate = '2020-10-2';
-        $queryFilters = 'filters=[{"field":"order_date","operator":"equal","value":"' . $orderDate . '"}]';
+        $queryFilters = 'filters=[{"field":"order_date","operator":"equals","value":"' . $orderDate . '"}]';
         $request = Request::create("test?{$queryFilters}");
 
         $orders = Order::filter($request)->get();
@@ -55,7 +55,7 @@ class EqualTest extends TestCase
     public function it_can_filter_datetime_fields()
     {
         $shipDate = '2020-10-3 10:30:00';
-        $queryFilters = 'filters=[{"field":"ship_date","operator":"equal","value":"' . $shipDate . '"}]';
+        $queryFilters = 'filters=[{"field":"ship_date","operator":"equals","value":"' . $shipDate . '"}]';
         $request = Request::create("test?{$queryFilters}");
 
         $orders = Order::filter($request)->get();
@@ -69,7 +69,7 @@ class EqualTest extends TestCase
     public function it_can_filter_custom_fields()
     {
         $lineSubtotal = 8.6;
-        $queryFilters = 'filters=[{"field":"line_subtotal","operator":"equal","value":"' . $lineSubtotal . '"}]';
+        $queryFilters = 'filters=[{"field":"line_subtotal","operator":"equals","value":"' . $lineSubtotal . '"}]';
         $request = Request::create("test?{$queryFilters}");
 
         $orders = Order::filter($request)->get();
@@ -83,7 +83,7 @@ class EqualTest extends TestCase
     public function it_can_filter_count_fields()
     {
         $linesCount = 2;
-        $queryFilters = 'filters=[{"field":"lines_count","operator":"equal","value":"' . $linesCount . '"}]';
+        $queryFilters = 'filters=[{"field":"lines_count","operator":"equals","value":"' . $linesCount . '"}]';
         $request = Request::create("test?{$queryFilters}");
 
         $orders = Order::filter($request)->get();
@@ -97,7 +97,7 @@ class EqualTest extends TestCase
     public function it_can_filter_relation_fields()
     {
         $storeName = 'Sociis Corporation';
-        $queryFilters = 'filters=[{"field":"store_name","operator":"equal","value":"' . $storeName . '"}]';
+        $queryFilters = 'filters=[{"field":"store_name","operator":"equals","value":"' . $storeName . '"}]';
         $request = Request::create("test?{$queryFilters}");
 
         $orders = Order::filter($request)->get();

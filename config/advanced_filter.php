@@ -13,8 +13,8 @@ return [
     */
 
     'operators' => [
-        'Equal' => ['=', 'equal'],
-        'NotEqual' => ['!=', 'notEqual'],
+        'Equals' => ['=', 'equals'],
+        'NotEquals' => ['!=', 'notEquals'],
         'GreaterThan' => ['>', 'greater'],
         'GreaterThanOrEqual' => ['>=', 'greaterOrEqual'],
         'LessThan' => ['<', 'less'],
@@ -55,7 +55,7 @@ return [
     |
     */
 
-    'default_operator' => 'Equal',
+    'default_operator' => 'Equals',
 
     /*
     |--------------------------------------------------------------------------
@@ -108,8 +108,8 @@ return [
     | Custom Query Format
     |--------------------------------------------------------------------------
     |
-    | Add you custom query format here
-    | this value will set as a default query format of the request
+    | Add your custom query format here
+    | this format will set as a default query format of the request
     |
     | example: MyQueryFormat::class
     |
@@ -149,6 +149,7 @@ return [
     | And should set it to TRUE if your columns type (in the database) is not "datetime or date"
     |
     */
+
     'cast_db_date' => false,
 
     /*

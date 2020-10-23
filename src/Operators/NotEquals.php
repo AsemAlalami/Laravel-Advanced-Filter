@@ -7,7 +7,7 @@ namespace AsemAlalami\LaravelAdvancedFilter\Operators;
 use AsemAlalami\LaravelAdvancedFilter\Fields\Field;
 use Illuminate\Database\Eloquent\Builder;
 
-class NotEqual extends Operator
+class NotEquals extends Operator
 {
     public function apply(Builder $builder, Field $field, $value, string $conjunction = 'and'): Builder
     {

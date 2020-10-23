@@ -6,7 +6,7 @@ use AsemAlalami\LaravelAdvancedFilter\Test\Models\Order;
 use AsemAlalami\LaravelAdvancedFilter\Test\TestCase;
 use Illuminate\Http\Request;
 
-class NotEqualTest extends TestCase
+class NotEqualsTest extends TestCase
 {
     /** @test */
     public function it_can_filter_string_fields()

@@ -8,7 +8,7 @@ use AsemAlalami\LaravelAdvancedFilter\Fields\Field;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 
-class Equal extends Operator
+class Equals extends Operator
 {
     /**
      * @inheritDoc
