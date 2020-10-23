@@ -26,10 +26,6 @@ class GreaterThan extends Operator
             $value = $value->endOfDay();
         }
 
-        if ($field->getDatatype() == 'datetime' && $value->second == 0) {
-            $value = $value->endOfMinute();
-        }
-
         return $builder->where($column, '>', $value, $conjunction);
     }
 

@@ -24,10 +24,6 @@ class LessThanOrEqual extends Operator
             }
         }
 
-        if ($field->getDatatype() == 'datetime' && $value->second == 0) {
-            $value = $value->endOfMinute();
-        }
-
         return $builder->where($column, '<=', $value, $conjunction);
     }
 

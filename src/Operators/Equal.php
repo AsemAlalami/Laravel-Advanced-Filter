@@ -26,6 +26,7 @@ class Equal extends Operator
             if ($castInDB) {
                 return $builder->whereDate($field->getColumn(), $this->getSqlOperator(), $value, $conjunction);
             } else {
+                // "between" will not keep indexing on the column, just as an option :)
                 return $builder->whereBetween($field->getColumn(), [$value, $value->clone()->endOfDay()], $conjunction);
             }
         }

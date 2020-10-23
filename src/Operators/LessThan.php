@@ -26,10 +26,6 @@ class LessThan extends Operator
             $value = $value->startOfDay();
         }
 
-        if ($field->getDatatype() == 'datetime' && $value->second == 0) {
-            $value = $value->startOfMinute();
-        }
-
         return $builder->where($column, '<', $value, $conjunction);
     }
 

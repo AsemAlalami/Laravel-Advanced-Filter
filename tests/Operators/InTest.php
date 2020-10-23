@@ -69,7 +69,7 @@ class InTest extends TestCase
     /** @test */
     public function it_can_filter_custom_fields()
     {
-        $lineSubtotal = "[8.6,20]";
+        $lineSubtotal = "[8.6,5.7]";
         $queryFilters = 'filters=[{"field":"line_subtotal","operator":"|","value":' . $lineSubtotal . '}]';
         $request = Request::create("test?{$queryFilters}");
 
@@ -77,7 +77,7 @@ class InTest extends TestCase
 
         $this->assertCount(2, $orders);
 
-        $this->assertEquals(['LAF_0002', 'LAF_0005'], $orders->pluck('reference')->toArray());
+        $this->assertEquals(['LAF_0004', 'LAF_0005'], $orders->pluck('reference')->toArray());
     }
 
     /** @test */

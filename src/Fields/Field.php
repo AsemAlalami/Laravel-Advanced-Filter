@@ -128,10 +128,8 @@ class Field
 
     public function getDatatype()
     {
-        // TODO: cache (as static) result to prevent calculate it again
-
         if (empty($this->datatype)) {
-            return $this->getFieldCastType($this->name, $this->getModel()->getCasts());
+            $this->datatype = $this->getFieldCastType($this->name, $this->getModel()->getCasts());
         }
 
         return $this->datatype;

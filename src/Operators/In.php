@@ -6,7 +6,6 @@ namespace AsemAlalami\LaravelAdvancedFilter\Operators;
 
 use AsemAlalami\LaravelAdvancedFilter\Exceptions\UnsupportedOperatorException;
 use AsemAlalami\LaravelAdvancedFilter\Fields\Field;
-use AsemAlalami\LaravelAdvancedFilter\QueryFormats\QueryFormat;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Arr;
 
@@ -21,8 +20,8 @@ class In extends Operator
             return $builder;
         }
 
-        if ($field->getDatatype() == 'date') {
-            return $this->applyOnDate($builder, $field, $value, $conjunction);
+        if ($field->getDatatype() == 'date' || $field->getDatatype() == 'datetime') {
+            return $this->applyOnDate($builder, $field, $value, $conjunction, $field->getDatatype() == 'datetime');
         }
 
         // to use in NotIn operator
@@ -52,7 +51,9 @@ class In extends Operator
 
         $value = implode(",", $this->getSqlValue($value));
 
-        return parent::applyOnCustom($builder, $field, "({$value})", $conjunction);
+        $sql = "{$field->getColumn()} {$this->getSqlOperator()} ({$value})";
+
+        return $builder->whereRaw($sql, [], $conjunction);
     }
 
     public function applyOnCount(Builder $builder, Field $field, $value, string $conjunction = 'and'): Builder
@@ -60,13 +61,18 @@ class In extends Operator
         throw new UnsupportedOperatorException($this->name, 'count');
     }
 
-    private function applyOnDate(Builder $builder, Field $field, $value, string $conjunction = 'and')
+    private function applyOnDate(Builder $builder, Field $field, $value, string $conjunction = 'and', bool $datetime = false)
     {
-        // TODO: cast values to Carbon and format it to date
-        $values = $this->getSqlValue($value);
+        // cast to date string
+        $values = array_map(function ($v) use ($datetime, $field) {
+            $v = $field->getCastedValue($v);
 
+            return $datetime ? $v->toDateTimeString() : $v->toDateString();
+        }, $this->getSqlValue($value));
+
+        $dbFormat = '%Y-%m-%d' . ($datetime ? ' %H:%M:%S' : '');
         $bind = implode(',', array_fill(0, count($values), '?'));
 
-        return $builder->whereRaw("DATE(`{$field->getColumn()}`) in ({$bind})", $values, $conjunction);
+        return $builder->whereRaw("strftime('{$dbFormat}', `{$field->getColumn()}`) in ({$bind})", $values, $conjunction);
     }
 }
