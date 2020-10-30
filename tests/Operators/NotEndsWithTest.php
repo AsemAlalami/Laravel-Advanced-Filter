@@ -26,15 +26,21 @@ class NotEndsWithTest extends TestCase
     /** @test */
     public function it_can_filter_numeric_fields()
     {
-        $subtotal = 5;
+        $subtotal = env('DB_CONNECTION') == 'sqlite' ? 5 : 50;
         $queryFilters = 'filters=[{"field":"subtotal","operator":"!$","value":"' . $subtotal . '"}]';
         $request = Request::create("test?{$queryFilters}");
 
         $orders = Order::filter($request)->get();
 
-        $this->assertCount(3, $orders);
+        if (env('DB_CONNECTION') == 'sqlite') {
+            $this->assertCount(3, $orders);
 
-        $this->assertEquals(['LAF_0002', 'LAF_0004', 'LAF_0005'], $orders->pluck('reference')->toArray());
+            $this->assertEquals(['LAF_0002', 'LAF_0004', 'LAF_0005'], $orders->pluck('reference')->toArray());
+        } else {
+            $this->assertCount(4, $orders);
+
+            $this->assertEquals(['LAF_0002', 'LAF_0003', 'LAF_0004', 'LAF_0005'], $orders->pluck('reference')->toArray());
+        }
     }
 
     /** @test */

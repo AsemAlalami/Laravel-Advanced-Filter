@@ -13,4 +13,6 @@ class NotIn extends In
     {
         return 'NOT IN';
     }
+
+    // TODO: I think the best way to filter relation fields by using "whereDoesntHave" and "IN" operator
 }

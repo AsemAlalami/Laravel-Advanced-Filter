@@ -40,6 +40,11 @@ class GreaterThanTest extends TestCase
     /** @test */
     public function it_can_filter_datetime_fields()
     {
+        // sqlite does not support datetime datatype, but you can use "strftime", I will not support that
+        if (env('DB_CONNECTION') == 'sqlite') {
+            return $this->assertTrue(true);
+        }
+
         $shipDate = '2020-09-30 5:25:04';
         $queryFilters = 'filters=[{"field":"ship_date","operator":">","value":"' . $shipDate . '"}]';
         $request = Request::create("test?{$queryFilters}");

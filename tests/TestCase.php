@@ -6,6 +6,7 @@ use AsemAlalami\LaravelAdvancedFilter\AdvancedFilterServiceProvider;
 use AsemAlalami\LaravelAdvancedFilter\Test\Seeds\DatabaseSeeder;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\Builder;
+use Illuminate\Foundation\Testing\RefreshDatabaseState;
 
 abstract class TestCase extends \Orchestra\Testbench\TestCase
 {
@@ -13,9 +14,15 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
     {
         parent::setUp();
 
-        $this->setupDatabase($this->app['db']->connection()->getSchemaBuilder());
+        if (!RefreshDatabaseState::$migrated || env('DB_DATABASE') == ':memory:') {
+            $this->artisan('migrate:fresh');
 
-        $this->seed(DatabaseSeeder::class);
+            $this->setupDatabase($this->app['db']->connection()->getSchemaBuilder());
+
+            $this->seed(DatabaseSeeder::class);
+
+            RefreshDatabaseState::$migrated = true;
+        }
     }
 
     protected function getPackageProviders($app)

@@ -54,7 +54,7 @@ class EqualsTest extends TestCase
     /** @test */
     public function it_can_filter_datetime_fields()
     {
-        $shipDate = '2020-10-3 10:30:00';
+        $shipDate = '2020-10-03 10:30:00';
         $queryFilters = 'filters=[{"field":"ship_date","operator":"equals","value":"' . $shipDate . '"}]';
         $request = Request::create("test?{$queryFilters}");
 

@@ -26,15 +26,22 @@ class EndsWithTest extends TestCase
     /** @test */
     public function it_can_filter_numeric_fields()
     {
-        $subtotal = 5;
+        // on mysql will not work as expected, because of the decimal digits
+        $subtotal = env('DB_CONNECTION') == 'sqlite' ? 5 : 50;
         $queryFilters = 'filters=[{"field":"subtotal","operator":"$","value":"' . $subtotal . '"}]';
         $request = Request::create("test?{$queryFilters}");
 
         $orders = Order::filter($request)->get();
 
-        $this->assertCount(2, $orders);
+        if (env('DB_CONNECTION') == 'sqlite') {
+            $this->assertCount(2, $orders);
 
-        $this->assertEquals(['LAF_0001', 'LAF_0003'], $orders->pluck('reference')->toArray());
+            $this->assertEquals(['LAF_0001', 'LAF_0003'], $orders->pluck('reference')->toArray());
+        } else {
+            $this->assertCount(1, $orders);
+
+            $this->assertEquals(['LAF_0001'], $orders->pluck('reference')->toArray());
+        }
     }
 
     /** @test */

@@ -31,10 +31,8 @@ class Equals extends Operator
             }
         }
 
-        if ($field->getDatatype() == 'datetime' && $value->second == 0) {
-            $value = [$value->startOfMinute(), $value->clone()->endOfMinute()];
-
-            return $builder->whereBetween($field->getColumn(), $value, $conjunction);
+        if ($field->getDatatype() == 'datetime') {
+            $value = $value->toDateTimeString();
         }
 
         return $builder->where($field->getColumn(), $this->getSqlOperator(), $value, $conjunction);

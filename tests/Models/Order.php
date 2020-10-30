@@ -28,7 +28,7 @@ class Order extends Model
     use HasFilter;
 
     protected $fillable = ['store_id', 'reference', 'order_date', 'subtotal', 'shipping_cost'];
-    protected $casts = ['order_date' => 'date', 'ship_date' => 'datetime'];
+    protected $casts = ['order_date' => 'date'];
 
     public function store()
     {
@@ -42,11 +42,17 @@ class Order extends Model
 
     public function setupFilter()
     {
-        $this->addFields(['reference' => 'order_number', 'order_date', 'ship_date', 'created_at']);
+        $this->addFields(['reference' => 'order_number', 'order_date', 'created_at']);
         $this->addFields(['subtotal', 'shipping_cost' => 'shipping'])->setDatatype('numeric');
+        $this->addField('ship_date')->setDatatype('datetime');
 
         $this->addFields(['store_id', 'store.name' => 'store_name']);
-        $this->addCustomField('store_reference', '( `stores`.`name` || "-" || `orders`.`reference`)', 'store');
+        if (env('DB_CONNECTION') == 'sqlite') {
+            $this->addCustomField('store_reference', '( `stores`.`name` || "-" || `orders`.`reference`)', 'store');
+        } else {
+            $this->addCustomField('store_reference', 'CONCAT( `stores`.`name`, "-", `orders`.`reference`)', 'store');
+        }
+
 
         $this->addCountField('orderLines', 'lines_count');
 

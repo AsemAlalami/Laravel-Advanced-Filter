@@ -70,6 +70,7 @@ trait HasFilter
                                 return $this->filterField($builder, $field, $operator, $value);
                             }
                         );
+//                        $builder->whereDoesntHave()
                     }
                 } else {
                     // apply on field
