@@ -4,6 +4,7 @@
 namespace AsemAlalami\LaravelAdvancedFilter\Operators;
 
 
+use AsemAlalami\LaravelAdvancedFilter\Exceptions\UnsupportedOperatorException;
 use AsemAlalami\LaravelAdvancedFilter\Fields\Field;
 use Illuminate\Database\Eloquent\Builder;
 use InvalidArgumentException;
@@ -22,30 +23,21 @@ class Between extends Operator
             return $builder;
         }
 
+        $values = ['from' => $field->getCastedValue($value['from']), 'to' => $field->getCastedValue($value['to'])];
+
         if ($field->getDatatype() == 'date') {
             $castInDB = config('advanced_filter.cast_db_date', false);
-            $values = [$field->getCastedValue($value['from']), $field->getCastedValue($value['to'])->endOfDay()];
-
             if ($castInDB) {
                 return $builder->where(function (Builder $builder) use ($values, $field, $value) {
-                    $builder->whereDate($field->getColumn(), '>=', $values[0])
-                        ->whereDate($field->getColumn(), '<=', $values[1]);
+                    $builder->whereDate($field->getColumn(), '>=', $values['from'])
+                        ->whereDate($field->getColumn(), '<=', $values['to']);
                 }, null, null, $conjunction);
-            } else {
-                return $builder->whereBetween($field->getColumn(), $values, $conjunction);
             }
+
+            $values['to'] = $values['to']->endOfDay(); // when using the between operator
         }
 
-        if ($field->getDatatype() == 'datetime' && $value->second == 0) {
-            $values = [
-                $field->getCastedValue($value['from'])->startOfMinute(),
-                $field->getCastedValue($value['to'])->endOfMinute()
-            ];
-
-            return $builder->whereBetween($field->getColumn(), $values, $conjunction);
-        }
-
-        return $builder->whereBetween($field->getColumn(), array_values($value), $conjunction);
+        return $builder->whereBetween($field->getColumn(), array_values($values), $conjunction);
     }
 
     /**
@@ -63,5 +55,21 @@ class Between extends Operator
         }
 
         return $value;
+    }
+
+    public function applyOnCustom(Builder $builder, Field $field, $value, string $conjunction = 'and'): Builder
+    {
+        if (empty($value)) {
+            return $builder;
+        }
+
+        $sql = "{$field->getColumn()} {$this->getSqlOperator()} ? and ?";
+
+        return $builder->whereRaw($sql, [array_values($this->getSqlValue($value))], $conjunction);
+    }
+
+    public function applyOnCount(Builder $builder, Field $field, $value, string $conjunction = 'and'): Builder
+    {
+        throw new UnsupportedOperatorException($this->name, 'count');
     }
 }

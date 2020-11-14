@@ -62,11 +62,13 @@ abstract class Operator
      */
     public function applyOnCustom(Builder $builder, Field $field, $value, string $conjunction = 'and'): Builder
     {
-        $sql = "{$field->getColumn()} {$this->getSqlOperator()} ?";
+        $sql = "{$field->getColumn()} {$this->getSqlOperator()} ";
 
         /** @link https://github.com/laravel/framework/issues/31201#issuecomment-615682788 */
         if ($field->getDatatype() == 'numeric') {
-            $sql .= ' + 0.0';
+            $sql .= '(? + 0.0)';
+        } else {
+            $sql .= '?';
         }
 
         return $builder->whereRaw($sql, [$this->getSqlValue($value)], $conjunction);

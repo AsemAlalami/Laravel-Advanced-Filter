@@ -35,7 +35,6 @@ class QueryFormatsTest extends TestCase
         $request = Request::create("test?{$queryFilters}");
 
         $filters = QueryFormat::factory($request)->getFilters();
-//        dd($filters);
 
         $this->assertEquals([$this->normalFilter], $filters);
     }
