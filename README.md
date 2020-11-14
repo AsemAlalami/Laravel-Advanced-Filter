@@ -1,8 +1,8 @@
 ## Laravel Advanced Filter
-This package allows you to filter/sort on laravel models
+This package allows you to filter on laravel models
 
-You can choose filter fields and customize its data-types, aliases and excepted operators, 
-and you can customize your request format, and add a new operator or overwrite an existed operators
+You can choose fields to filtering and customize its data-types, aliases and excepted operators, 
+you can add/customize your request format, and you add new operators or overwrite the existed operators
 
 
 ### Installation  
@@ -23,7 +23,7 @@ These default config file that will be published:
 
 ### Usage
 - use `HasFilter` trait in the model
-- add your fields in the implementation of abstract function `setupFilter`
+- add fields in the implementation of the abstract function `setupFilter`
 ```php
 class Order extends Model
 {
@@ -38,9 +38,9 @@ class Order extends Model
         return $this->belongsTo(Channel::class);
     }
 
-    public function orderLineItems()
+    public function orderLines()
     {
-        return $this->hasMany(OrderLineItem::class);
+        return $this->hasMany(OrderLine::class);
     }
 
     public function setupFilter()
@@ -51,7 +51,7 @@ class Order extends Model
         // field from relation
         $this->addFields(['channel.created_at' => 'channel_create'])->setDatatype('date');
         // field from relation count
-        $this->addCountField('orderLineItems');
+        $this->addCountField('orderLines');
         // custom field (raw sql)
         $this->addCustomField('my_total', '(shipping_cost + subtotal)');
     }
@@ -73,53 +73,66 @@ class Order extends Model
 ```
 
 ### Query Format
-Query format is shape of the request, the package support 3 formats, and you can define a new format
-- `json` (default): the request will send filters as json 
+Query format is the shape that you want to send your query(filters) in the request.
+the package support 3 formats, and you can create a new format.
+- `json` (default): the filters will send as json in the request
     ```json
     filters=[{"field":"email","operator":"equal","value":"abc"}]
     ```
-- `array`: the request will send filters as array
+- `array`: the filters will send as array in the request
     ```
     filters[email][value]=abc&filters[email][operator]=equal
     ```
-- `separate`: the request will send as well as in `array`, but separated by a separator, 
+- `separator`: the filters will send as well as in the `array` format, but separated by a separator(`^` default) 
     
-    the format set with separator symbol `separate:^`
+    the format sets with a separator symbol `separator:^`
     ```
     filters^email^value=abc&filters^email^operator=equal
     ```
 > set the default query format in the config file `query_format` attribute
 
-##### Define a new query format:
+##### Create a new query format:
 - create a new class and extends it from `QueryFormat`: `class MyFormat extends QueryFormat`
-- implement abstract function `format` that returns `FilterRequest`
-- add class to the config file in `custom_query_format` attribute: `'custom_query_format' => MyFormat::class,`
-
+- implement the abstract function `format` that returns `FilterRequest` object
+- add the class to the config file in `custom_query_format` attribute: `'custom_query_format' => MyFormat::class,`
 
 ### Fields
 Normal Field options:
 - field name is the column name
-- alias is the key that you want to send it in the request
-- data-type set from model `casts` by default, if you want to set custom data-type use `setDatatype`
-- operators, field will accept all operators unless you use `setExceptedOperators` to exclude some operators
-- a relational field, only set field name by `.` separator `channel.name`, `channel.type.name`
-    > you can define field by `.` separator, but consider it as a non relational field by assign `false` for `inRelation` parameter
+- alias is the key that you want to send in the request
+- data-type: by default it set from model `casts`, if you want to set custom data-type, use `setDatatype`
+- operators: the field will accept all operators unless you use `setExceptedOperators` to exclude some operators
+- a relational field: only set the field name by `.` separator `channel.name`, `channel.type.name`
+    > you can define field name by `.` separator, but you want to consider it as a non relational field 
+    > by pass `false` for `inRelation` parameter (used in NoSQL DB or join between tables)
     ```php 
     $this->addField('channels.name', 'channel_name', false);
     ```
-- customize a query, you can make a scope for the field to customize a filter behavior, scope name must be combined 3 sections :
+- customize a field query, you can make a scope for the field to customize the filter behavior. 
+    scope name must be combined 3 sections :
     - scope
-    - `prefix_scope_function`value of the key in config file (`where` is the default)
-    - attribute name(or relation name) for example `email`
+    - the value of `prefix_scope_function` key in config file (`where` is the default)
+    - field name(or relation name) for example `email`
     ```php
     public function scopeWhereEmail(Builder $builder, Field $field, string $operator, $value, $conjunction = 'and')
     ```
-    > you can customize specific attribute in relational field by define the scope in the relation model
+    > you can customize a relational field by define the scope in the relation model OR define scope by relation name
                                                                                                                                                                                                                                                                                                                                                                                                                
-    > you can use `applyOperator` function to use default behavior `$builder->applyOperator($operator, $field, $value, $conjunction);`
+    ```php
+    OrderLine.php
+  
+    public function scopeWherePrice(Builder $builder, Field $field, string $operator, $value, $conjunction = 'and')
     
-You can add fields to model by using 4 functions:
-- `addField`(string $field, string $alias = null, ?bool $inRelation = null): default alias same field name
+    OR
+  
+    Order.php
+  
+    public function scopeWhereOrderLines(Builder $builder, Field $field, string $operator, $value, $conjunction = 'and')
+    ```
+    > you can use `applyOperator` function to use the default behavior `$builder->applyOperator($operator, $field, $value, $conjunction);`
+    
+You can add fields to a model by using 4 functions:
+- `addField`(string $field, string $alias = null, ?bool $inRelation = null): by default alias value same as field name value
     ```php
     $this->addField('total')->setDatatype('numeric');
     ```
@@ -128,193 +141,55 @@ You can add fields to model by using 4 functions:
     $this->addFields(['created_at' => 'create_date', 'order_date'])->setDatatype('date');
     ```
 - `addCountField`(string $relation, string $alias = null, callable $callback = null): add a field from count of relation,
-    use can customize the count query and alias(by default is camel case on relation plus `_count`)
+    use can customize the count query and alias(by default is concat relation name(snake case) and `_count`)
     ```php 
-    $this->addCountField('orderLineItems', 'lines_count', function (Builder $builder) {
+    $this->addCountField('orderLines');
+  
+    $this->addCountField('orderLines', 'lines_count', function (Builder $builder) {
         $builder->where('quantity', '>', 1);
     });
     ```
+   > 
 - `addCustomField`(string $alias, string $sqlRaw, $relation = null): add a field from raw sql query
     ```php
     $this->addCustomField('my_total', '(`shipping_cost` + `subtotal`)');
-    $this->addCustomField('line_subtotal', '(`price` + `quantity`)', 'orderLineItems');
+    $this->addCustomField('line_subtotal', '(`price` + `quantity`)', 'orderLines'); // inside "orderLines" relation
     ```
 
 ### Conjunction
-Currently the package support one conjunction between all fields
+Currently, the package support one conjunction between all fields
 `and` | `or`, default conjunction attribute in the config file `default_conjunction`
 
 ### Operators
-The package has a many of operators, and you can define a new operators,
-also the package support customize the operators aliases to send in the request
-- Equal
-- NotEqual
-- GreaterThan
-- GreaterThanOrEqual
-- LessThan
-- LessThanOrEqual
+The package has many operators, you can create new operators, 
+and you can customize the operators aliases that you want to send in the request
+- Equals (`=`, `equals`)
+- NotEquals (`!=`, `notEquals`)
+- GreaterThan (`>` , `greater`)
+- GreaterThanOrEqual (`>=`, `greaterOrEqual`)
+- LessThan (`<`, `less`)
+- LessThanOrEqual (`<=`, `lessOrEqual`)
+- In (`|`, `in`)
+- NotIn (`!|`, `notIn`)
+- Contains (`*`, `contains`)
+- NotContains (`!*`, `notContains`)
+- StartsWith (`^`, `startsWith`)
+- NotStartsWith (`!^`, `notStartsWith`)
+- EndsWith (`$`, `endsWith`)
+- NotEndsWith (`!$`, `notEndsWith`)
+- Between (`><`, `between`)
 
-
-##### Define a new Operator:
+##### Create a new Operator:
 - create a new class and extends it from `Operator`: `class MyOperator extends Operator`
-- implement abstract function `apply` and `getSqlOperator` (used as a default sql operator for count and custom field)
+- implement the abstract function `apply` and `getSqlOperator` (used as a default sql operator for count and custom field)
 - add the class in the config file in `custom_operators` attribute: `'custom_operators' => [MyOperator::class => ['my-op', '*']],`
 
+### Data Types:
+- boolean
+- date
+- datetime
+- numeric
+- string
+
 ### Config
-
-```php
-/*
-|--------------------------------------------------------------------------
-| Operators
-|--------------------------------------------------------------------------
-|
-| These build-in package operators and its aliases
-| You can customize default aliases, remove any operator
-|
-*/
-
-'operators' => [
-    'Equal' => ['=', 'equal'],
-    'NotEqual' => ['!=', 'notEqual'],
-    'GreaterThan' => ['>', 'greater'],
-    'GreaterThanOrEqual' => ['>=', 'greaterOrEqual'],
-    'LessThan' => ['<', 'less'],
-    'LessThanOrEqual' => ['<=', 'lessOrEqual'],
-],
-
-/*
-|--------------------------------------------------------------------------
-| Custom Operators
-|--------------------------------------------------------------------------
-|
-| Add your operators here
-|
-| example: operator class and its aliases
-|   MyOperator::class => ['my-op', '*']
-|
-*/
-
-'custom_operators' => [
-
-],
-
-/*
-|--------------------------------------------------------------------------
-| Default Operator
-|--------------------------------------------------------------------------
-|
-| Default operator if the field sent in the request without operator
-|
-*/
-
-'default_operator' => 'Equal',
-
-/*
-|--------------------------------------------------------------------------
-| Prefix Operator Function
-|--------------------------------------------------------------------------
-|
-| This option used when binging operators to Builder
-| The operators bound to Builder by using macros
-|
-| example:
-|   if you want to filter by GreaterThan operator
-|   $orders->filterWhereGreaterThan('total', 100)
-|
-*/
-
-'prefix_operator_function' => 'filterWhere',
-
-/*
-|--------------------------------------------------------------------------
-| Default Conjunction
-|--------------------------------------------------------------------------
-|
-| This option used when request sent without conjunction
-|
-| values: and | or
-|
-*/
-
-'default_conjunction' => 'and',
-
-/*
-|--------------------------------------------------------------------------
-| Default Query Format
-|--------------------------------------------------------------------------
-|
-| This option controls the default query format.
-| This format is used when sending request.
-|
-| Supported:
-|   -  "separate:^"     : filters^email^value=abc&filters^email^operator=equal
-|   -  "array"          : filters[email][value]=abc&filters[email][operator]=equal
-|   -  "json" (Default) : filters=[{"field":"email","operator":"equal","value":"abc"}]
-|
-*/
-
-'query_format' => 'json',
-
-/*
-|--------------------------------------------------------------------------
-| Custom Query Format
-|--------------------------------------------------------------------------
-|
-| Add you custom query format here
-| this value will set as a default query format of the request
-|
-| example: MyQueryFormat::class
-|
-*/
-
-'custom_query_format' => null,
-
-/*
-|--------------------------------------------------------------------------
-| Request Parameters Names
-|--------------------------------------------------------------------------
-|
-| This options to customize your request parameters names
-|
-*/
-
-// name of the parameter that contains the fields
-'param_filter_name' => 'filters', // or as prefix in "separate" query format
-// name of the parameter that set the conjunction
-'param_conjunction_name' => 'conjunction',
-// names of the parameters that define the field
-'field_params' => [
-    'field' => 'field', // filed name, only used in "json" query format
-    'operator' => 'operator', // field operator
-    'value' => 'value', // field value
-],
-
-/*
-|--------------------------------------------------------------------------
-| Cast date in the database
-|--------------------------------------------------------------------------
-|
-| This options will use "whereDate" function to compare date fields
-| the default will compare by start/end of day (as between)
-| this feature for big-data if you have index on the column
-|
-| And should set it to TRUE if your columns type (in the database) is not "datetime or date"
-|
-*/
-'cast_db_date' => false,
-
-/*
-|--------------------------------------------------------------------------
-| Prefix Scope Function
-|--------------------------------------------------------------------------
-|
-| This options used when you want to customize field filter behavior by defining scope for it
-|
-| example:
-|   you need to customize behavior for "email" field, the scope function name with be:
-|   scopeWhereEmail(Builder $builder, Field $field, string $operator, $value, $conjunction = 'and')
-|
-*/
-
-'prefix_scope_function' => 'where'
-```
+[Config File](https://github.com/AsemAlalami/Laravel-Advanced-Filter/blob/master/config/advanced_filter.php)
