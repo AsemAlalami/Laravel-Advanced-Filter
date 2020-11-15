@@ -8,7 +8,7 @@ you can add/customize your request format, and you add new operators or overwrit
 ### Installation  
 You can install the package via composer:
 ```  
-composer required AsemAlalami/Laravel-Advanced-Filter
+composer require asemalalami/laravel-advanced-filter
 ```  
 
 The package will automatically register its service provider.

@@ -17,7 +17,7 @@ class AdvancedFilterServiceProvider extends ServiceProvider
     {
         $this->publishes([
             __DIR__ . '/../config/advanced_filter.php' => config_path('advanced_filter.php'),
-        ]);
+        ], 'config');
     }
 
     /**
