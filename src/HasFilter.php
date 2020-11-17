@@ -62,7 +62,7 @@ trait HasFilter
                 // apply filter inside relation if the field from relation
                 if ($field->isFromRelation()) {
                     // apply on custom scope if the relation has scope
-                    if ($builder->hasNamedScope($field->getScopeRelationFunctionName())) {
+                    if ($this->modelHasScope($builder, $field->getScopeRelationFunctionName())) {
                         $builder = $builder->{$field->getScopeRelationFunctionName()}($field, $operator, $value, $conjunction);
                     } else {
                         $builder = $builder->has($field->getRelation(), '>=', 1, $conjunction,
@@ -70,7 +70,6 @@ trait HasFilter
                                 return $this->filterField($builder, $field, $operator, $value);
                             }
                         );
-//                        $builder->whereDoesntHave()
                     }
                 } else {
                     // apply on field
@@ -98,11 +97,23 @@ trait HasFilter
     private function filterField(Builder $builder, Field $field, $operator, $value, $conjunction = 'and')
     {
         // apply on custom scope if the field has scope
-        if ($builder->hasNamedScope($field->getScopeFunctionName())) {
+        if ($this->modelHasScope($builder, $field->getScopeFunctionName())) {
             return $builder->{$field->getScopeFunctionName()}($field, $operator, $value, $conjunction);
         }
 
         return $builder->{Operator::getFunction($operator)}($field, $value, $conjunction);
+    }
+
+    /**
+     * Determine if the given model has a scope.
+     *
+     * @param Builder $builder
+     * @param $scopeName
+     * @return bool
+     */
+    private function modelHasScope(Builder $builder, $scopeName)
+    {
+        return $builder->getModel() && method_exists($builder->getModel(), 'scope' . ucfirst($scopeName));
     }
 
     public function initializeHasFilter()

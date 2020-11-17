@@ -1,11 +1,11 @@
-## Laravel Advanced Filter
+# Laravel Advanced Filter
 This package allows you to filter on laravel models
 
 You can choose fields to filtering and customize its data-types, aliases and excepted operators, 
 you can add/customize your request format, and you add new operators or overwrite the existed operators
 
 
-### Installation  
+## Installation  
 You can install the package via composer:
 ```  
 composer require asemalalami/laravel-advanced-filter
@@ -21,7 +21,7 @@ php artisan vendor:publish --provider="AsemAlalami\LaravelAdvancedFilter\Advance
 These default config file that will be published:
  [Config File](https://github.com/AsemAlalami/Laravel-Advanced-Filter/blob/master/config/advanced_filter.php)
 
-### Usage
+## Usage
 - use `HasFilter` trait in the model
 - add fields in the implementation of the abstract function `setupFilter`
 ```php
@@ -72,7 +72,7 @@ class Order extends Model
 }
 ```
 
-### Query Format
+## Query Format
 Query format is the shape that you want to send your query(filters) in the request.
 the package support 3 formats, and you can create a new format.
 - `json` (default): the filters will send as json in the request
@@ -91,12 +91,12 @@ the package support 3 formats, and you can create a new format.
     ```
 > set the default query format in the config file `query_format` attribute
 
-##### Create a new query format:
+#### Create a new query format:
 - create a new class and extends it from `QueryFormat`: `class MyFormat extends QueryFormat`
 - implement the abstract function `format` that returns `FilterRequest` object
 - add the class to the config file in `custom_query_format` attribute: `'custom_query_format' => MyFormat::class,`
 
-### Fields
+## Fields
 Normal Field options:
 - field name is the column name
 - alias is the key that you want to send in the request
@@ -156,11 +156,11 @@ You can add fields to a model by using 4 functions:
     $this->addCustomField('line_subtotal', '(`price` + `quantity`)', 'orderLines'); // inside "orderLines" relation
     ```
 
-### Conjunction
+## Conjunction
 Currently, the package support one conjunction between all fields
 `and` | `or`, default conjunction attribute in the config file `default_conjunction`
 
-### Operators
+## Operators
 The package has many operators, you can create new operators, 
 and you can customize the operators aliases that you want to send in the request
 - Equals (`=`, `equals`)
@@ -179,17 +179,17 @@ and you can customize the operators aliases that you want to send in the request
 - NotEndsWith (`!$`, `notEndsWith`)
 - Between (`><`, `between`)
 
-##### Create a new Operator:
+#### Create a new Operator:
 - create a new class and extends it from `Operator`: `class MyOperator extends Operator`
 - implement the abstract function `apply` and `getSqlOperator` (used as a default sql operator for count and custom field)
 - add the class in the config file in `custom_operators` attribute: `'custom_operators' => [MyOperator::class => ['my-op', '*']],`
 
-### Data Types:
+## Data Types:
 - boolean
 - date
 - datetime
 - numeric
 - string
 
-### Config
+## Config
 [Config File](https://github.com/AsemAlalami/Laravel-Advanced-Filter/blob/master/config/advanced_filter.php)
