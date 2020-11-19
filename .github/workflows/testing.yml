@@ -11,10 +11,11 @@ jobs:
     runs-on: ubuntu-latest
     name: PHP ${{ matrix.php }} - Laravel ${{ matrix.laravel }}
     strategy:
+      fail-fast: true
       matrix:
         php: [ 7.2, 7.3, 7.4 ]
         laravel: [ 5.8.*, 6.* ]
-        dependency-version: [ prefer-lowest ]
+        dependency-version: [ prefer-lowest, prefer-stable ]
         include:
           - laravel: 6.*
             testbench: 4.*
