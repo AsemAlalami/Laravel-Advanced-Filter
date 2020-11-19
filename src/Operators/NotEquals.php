@@ -21,12 +21,12 @@ class NotEquals extends Operator
             if ($castInDB) {
                 return $builder->whereDate($field->getColumn(), $this->getSqlOperator(), $value, $conjunction);
             } else {
-                return $builder->whereNotBetween($field->getColumn(), [$value, $value->clone()->endOfDay()], $conjunction);
+                return $builder->whereNotBetween($field->getColumn(), [$value, (clone $value)->endOfDay()], $conjunction);
             }
         }
 
         if ($field->getDatatype() == 'datetime' && $value->second == 0) {
-            return $builder->whereNotBetween($field->getColumn(), [$value, $value->clone()->endOfMinute()], $conjunction);
+            return $builder->whereNotBetween($field->getColumn(), [$value, (clone $value)->endOfMinute()], $conjunction);
         }
 
         return $builder->where($field->getColumn(), $this->getSqlOperator(), $value, $conjunction);
