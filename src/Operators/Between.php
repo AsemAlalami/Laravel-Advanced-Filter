@@ -63,7 +63,13 @@ class Between extends Operator
             return $builder;
         }
 
-        $sql = "{$field->getColumn()} {$this->getSqlOperator()} ? and ?";
+        $sql = "{$field->getColumn()} {$this->getSqlOperator()} ";
+
+        if ($field->getDatatype() == 'numeric') {
+            $sql .= '(? + 0.0) and (? + 0.0)';
+        } else {
+            $sql .= '? and ?';
+        }
 
         return $builder->whereRaw($sql, [array_values($this->getSqlValue($value))], $conjunction);
     }
