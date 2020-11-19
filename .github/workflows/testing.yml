@@ -12,12 +12,16 @@ jobs:
     name: PHP ${{ matrix.php }} - Laravel ${{ matrix.laravel }}
     strategy:
       fail-fast: true
-      max-parallel: 1
+      max-parallel: 4
       matrix:
-        php: [ 7.2, 7.3, 7.4 ]
-        laravel: [ 5.8.*, 6.* ]
-        dependency-version: [ prefer-lowest, prefer-stable ]
+        php: [ 7.3 ]
+        laravel: [ 5.8.*, 6.*, 7.*, 8.* ]
+        dependency-version: [ prefer-stable ]
         include:
+          - laravel: 8.*
+            testbench: 6.*
+          - laravel: 7.*
+            testbench: 5.*
           - laravel: 6.*
             testbench: 4.*
           - laravel: 5.8.*
