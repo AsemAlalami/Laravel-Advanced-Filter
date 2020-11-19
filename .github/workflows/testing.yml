@@ -12,6 +12,7 @@ jobs:
     name: PHP ${{ matrix.php }} - Laravel ${{ matrix.laravel }}
     strategy:
       fail-fast: true
+      max-parallel: 1
       matrix:
         php: [ 7.2, 7.3, 7.4 ]
         laravel: [ 5.8.*, 6.* ]
