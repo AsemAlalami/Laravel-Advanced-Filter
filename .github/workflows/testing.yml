@@ -31,6 +31,15 @@ jobs:
 
     env: ${{ matrix.env }}
 
+    services:
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: yes
+          MYSQL_DATABASE: test
+        ports:
+          - 3306
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v1
@@ -45,18 +54,6 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-
-      - name: Shutdown Ubuntu MySQL (SUDO)
-        if: ${{env.DB_CONNECTION == 'mysql'}}
-        run: sudo service mysql stop # Shutdown the Default MySQL, "sudo" is necessary, please not remove it
-
-      - name: Setup MySQL
-        if: ${{env.DB_CONNECTION == 'mysql'}}
-        uses: mirromutth/mysql-action@v1.1
-        with:
-          mysql user: 'root'
-          mysql password: 'password'
-          mysql database: 'test'
 
       - name: Install dependencies
         run: |
