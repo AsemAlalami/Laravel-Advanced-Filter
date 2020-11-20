@@ -54,9 +54,9 @@ jobs:
         if: ${{env.DB_CONNECTION == 'mysql'}}
         uses: mirromutth/mysql-action@v1.1
         with:
-          mysql user: ${{ env.DB_USERNAME }}
-          mysql password: ${{ env.DB_PASSWORD }}
-          mysql database: ${{ env.DB_DATABASE }}
+          mysql user: 'root'
+          mysql password: 'password'
+          mysql database: 'test'
 
       - name: Install dependencies
         run: |
