@@ -4,6 +4,7 @@
 namespace AsemAlalami\LaravelAdvancedFilter\Operators;
 
 
+use AsemAlalami\LaravelAdvancedFilter\Exceptions\UnsupportedDriverException;
 use AsemAlalami\LaravelAdvancedFilter\Exceptions\UnsupportedOperatorException;
 use AsemAlalami\LaravelAdvancedFilter\Fields\Field;
 use Illuminate\Database\Eloquent\Builder;
@@ -21,14 +22,19 @@ class In extends Operator
             return $builder;
         }
 
+        // values depends on field type
+        $values = array_map(function ($v) use ($field) {
+            return $field->getCastedValue($v);
+        }, $this->getSqlValue($value));
+
         if ($field->getDatatype() == 'date') {
-            return $this->applyOnDate($builder, $field, $value, $conjunction);
+            return $this->applyOnDate($builder, $field, $values, $conjunction);
         }
 
         // to use in NotIn operator
         $notIn = $this->getSqlOperator() != 'IN';
 
-        return $builder->whereIn($field->getColumn(), $this->getSqlValue($value), $conjunction, $notIn);
+        return $builder->whereIn($field->getColumn(), $values, $conjunction, $notIn);
     }
 
     /**
@@ -62,12 +68,16 @@ class In extends Operator
         throw new UnsupportedOperatorException($this->name, 'count');
     }
 
-    private function applyOnDate(Builder $builder, Field $field, $value, string $conjunction = 'and')
+    private function applyOnDate(Builder $builder, Field $field, $values, string $conjunction = 'and')
     {
+        if ($builder->getConnection()->getName() == 'mongodb') {
+            throw new UnsupportedDriverException('MongoDB', 'In operator on Date');
+        }
+
         // cast to date string
         $values = array_map(function ($v) use ($field) {
-            return $field->getCastedValue($v)->toDateString();
-        }, $this->getSqlValue($value));
+            return $v->toDateString();
+        }, $values);
 
         if ($builder->getConnection()->getName() == 'sqlite') {
             return $this->applyDateOnSQLite($builder, $field->getColumn(), $values, $conjunction);

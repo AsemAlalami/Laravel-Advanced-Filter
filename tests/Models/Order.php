@@ -4,7 +4,6 @@ namespace AsemAlalami\LaravelAdvancedFilter\Test\Models;
 
 use AsemAlalami\LaravelAdvancedFilter\HasFilter;
 use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 
 /**
@@ -23,12 +22,13 @@ use Illuminate\Support\Collection;
  * @property Store $store
  * @property Collection|OrderLine[] $orderLines
  */
-class Order extends Model
+class Order extends BaseModel
 {
     use HasFilter;
 
     protected $fillable = ['store_id', 'reference', 'order_date', 'subtotal', 'shipping_cost'];
     protected $casts = ['order_date' => 'date'];
+    protected $dates = ['ship_date'];
 
     public function store()
     {

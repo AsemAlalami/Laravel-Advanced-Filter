@@ -4,6 +4,7 @@
 namespace AsemAlalami\LaravelAdvancedFilter\Operators;
 
 
+use AsemAlalami\LaravelAdvancedFilter\Exceptions\UnsupportedDriverException;
 use AsemAlalami\LaravelAdvancedFilter\Fields\Field;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -88,11 +89,19 @@ abstract class Operator
     {
         // if the field is custom, call applyOnCustom function
         if ($field->isCustom()) {
+            if ($builder->getConnection()->getName() == 'mongodb') {
+                throw new UnsupportedDriverException('MongoDB', 'custom');
+            }
+
             return $this->applyOnCustom($builder, $field, $value, $conjunction);
         }
 
         // if the field is count, call applyOnCount function
         if ($field->isCount()) {
+            if ($builder->getConnection()->getName() == 'mongodb') {
+                throw new UnsupportedDriverException('MongoDB', 'custom');
+            }
+
             return $this->applyOnCount($builder, $field, $value, $conjunction);
         }
 

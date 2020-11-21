@@ -2,6 +2,7 @@
 
 namespace AsemAlalami\LaravelAdvancedFilter;
 
+use AsemAlalami\LaravelAdvancedFilter\Exceptions\UnsupportedDriverException;
 use AsemAlalami\LaravelAdvancedFilter\Fields\Field;
 use AsemAlalami\LaravelAdvancedFilter\Fields\HasFields;
 use AsemAlalami\LaravelAdvancedFilter\Operators\Operator;
@@ -65,6 +66,10 @@ trait HasFilter
                     if ($this->modelHasScope($builder, $field->getScopeRelationFunctionName())) {
                         $builder = $builder->{$field->getScopeRelationFunctionName()}($field, $operator, $value, $conjunction);
                     } else {
+                        if ($builder->getConnection()->getName() == 'mongodb') {
+                            throw new UnsupportedDriverException('MongoDB', 'relational');
+                        }
+
                         $builder = $builder->has($field->getRelation(), '>=', 1, $conjunction,
                             function (Builder $builder) use ($field, $value, $operator) {
                                 return $this->filterField($builder, $field, $operator, $value);

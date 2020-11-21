@@ -12,28 +12,23 @@ jobs:
     name: PHP ${{ matrix.php }} - Laravel ${{ matrix.laravel }} - DB ${{ matrix.env.DB_CONNECTION }}
     strategy:
       fail-fast: true
-      max-parallel: 1
+      max-parallel: 4
       matrix:
         php: [ 7.3 ]
         laravel: [ 5.8.*, 6.*, 7.*, 8.* ]
         dependency-version: [ prefer-stable ]
         env:
-          - { DB_CONNECTION: 'mongo', DB_DATABASE: 'test', DB_PORT: 27017 }
           - { DB_CONNECTION: 'sqlite', DB_DATABASE: ':memory:' }
           - { DB_CONNECTION: 'mysql', DB_DATABASE: 'test', DB_USERNAME: 'root', DB_PORT: 3306 }
         include:
           - laravel: 8.*
             testbench: 6.*
-            mongodb: 3.8.*
           - laravel: 7.*
             testbench: 5.*
-            mongodb: 3.7.*
           - laravel: 6.*
             testbench: 4.*
-            mongodb: 3.6.*
           - laravel: 5.8.*
             testbench: 3.8.*
-            mongodb: 3.5.*
 
     env: ${{ matrix.env }}
 
@@ -45,10 +40,6 @@ jobs:
           MYSQL_DATABASE: test
         ports:
           - 3306:3306
-      mongo:
-        image: mongo:4.0
-        ports:
-          - 27017:27017
 
     steps:
       - name: Checkout code
@@ -67,7 +58,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          composer require "laravel/framework:${{ matrix.laravel }}" "orchestra/testbench:${{ matrix.testbench }}" "jenssegers/mongodb:${{ matrix.mongodb }}" --no-interaction --no-update
+          composer require "laravel/framework:${{ matrix.laravel }}" "orchestra/testbench:${{ matrix.testbench }}" --no-interaction --no-update
           composer update --${{ matrix.dependency-version }} --prefer-dist --no-interaction --no-suggest
 
       - name: Execute tests

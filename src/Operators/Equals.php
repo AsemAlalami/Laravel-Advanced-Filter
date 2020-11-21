@@ -31,10 +31,6 @@ class Equals extends Operator
             }
         }
 
-        if ($field->getDatatype() == 'datetime') {
-            $value = $value->toDateTimeString();
-        }
-
         return $builder->where($field->getColumn(), $this->getSqlOperator(), $value, $conjunction);
     }
 

@@ -7,6 +7,7 @@ use AsemAlalami\LaravelAdvancedFilter\Test\Seeds\DatabaseSeeder;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\Builder;
 use Illuminate\Foundation\Testing\RefreshDatabaseState;
+use Illuminate\Support\Facades\Config;
 
 abstract class TestCase extends \Orchestra\Testbench\TestCase
 {
@@ -14,7 +15,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
     {
         parent::setUp();
 
-        if (!RefreshDatabaseState::$migrated || env('DB_DATABASE') == ':memory:') {
+        if (!RefreshDatabaseState::$migrated || env('DB_CONNECTION') == 'sqlite') {
             $this->artisan('migrate:fresh');
 
             $this->setupDatabase($this->app['db']->connection()->getSchemaBuilder());
@@ -29,12 +30,26 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
     {
         return [
             AdvancedFilterServiceProvider::class,
+//            MongodbServiceProvider::class
         ];
     }
 
     protected function getEnvironmentSetUp($app)
     {
-        // perform environment setup
+        // setup mongodb config
+        if (env('DB_CONNECTION') == 'mongodb') {
+            Config::set('database.connections.mongodb', [
+                'driver' => 'mongodb',
+                'host' => env('DB_HOST', '127.0.0.1'),
+                'port' => env('DB_PORT', 27017),
+                'database' => env('DB_DATABASE', 'test'),
+                'username' => env('DB_USERNAME'),
+                'password' => env('DB_PASSWORD'),
+                'options' => [
+                    'database' => 'admin' // sets the authentication database required by mongo 3
+                ]
+            ]);
+        }
     }
 
     private function setupDatabase(Builder $schema)

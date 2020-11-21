@@ -14,7 +14,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
-class Product extends Model
+class Product extends BaseModel
 {
     protected $fillable = ['name', 'sku'];
 

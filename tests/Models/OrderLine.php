@@ -16,7 +16,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
-class OrderLine extends Model
+class OrderLine extends BaseModel
 {
     protected $fillable = ['order_id', 'product_id', 'price', 'quantity'];
 

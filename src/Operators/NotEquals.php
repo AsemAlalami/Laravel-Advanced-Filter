@@ -25,7 +25,7 @@ class NotEquals extends Operator
             }
         }
 
-        if ($field->getDatatype() == 'datetime' && $value->second == 0) {
+        if ($field->getDatatype() == 'datetime') {
             return $builder->whereNotBetween($field->getColumn(), [$value, (clone $value)->endOfMinute()], $conjunction);
         }
 
