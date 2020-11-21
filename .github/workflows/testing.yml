@@ -33,7 +33,6 @@ jobs:
     env: ${{ matrix.env }}
 
     services:
-      if: ${{matrix.env.DB_CONNECTION == 'mysql'}}
       mysql:
         image: mysql:5.7
         env:
