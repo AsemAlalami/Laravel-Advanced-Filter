@@ -48,14 +48,16 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Default Operator
+    | Default Operators
     |--------------------------------------------------------------------------
     |
-    | Default operator if the field sent in the request without operator
+    | The Default operators if the field sent in the request without operator
+    | or for general search
     |
     */
 
-    'default_operator' => 'Equals',
+    'default_operator' => 'equals',
+    'default_general_search_operator' => 'startsWith',
 
     /*
     |--------------------------------------------------------------------------
@@ -126,16 +128,18 @@ return [
     |
     */
 
-    // name of the parameter that contains the fields
+    // the parameter name that contains the fields
     'param_filter_name' => 'filters', // or as prefix in "separate" query format
-    // name of the parameter that set the conjunction
+    // the parameter name that set the conjunction
     'param_conjunction_name' => 'conjunction',
-    // names of the parameters that define the field
+    // the parameters names that define the field
     'field_params' => [
         'field' => 'field', // filed name, only used in "json" query format
         'operator' => 'operator', // field operator
         'value' => 'value', // field value
     ],
+    // the parameter name that contains the general search value
+    'param_general_search_name' => 'query',
 
     /*
     |--------------------------------------------------------------------------

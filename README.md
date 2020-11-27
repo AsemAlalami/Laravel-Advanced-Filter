@@ -24,7 +24,7 @@ These default config file that will be published:
 ## Usage
 - use `HasFilter` trait in the model
 - add fields in the implementation of the abstract function `setupFilter`
-- call `filter` scope in your controller
+- call the `filter` scope in your controller
 ```php
 class Order extends Model
 {

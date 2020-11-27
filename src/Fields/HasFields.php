@@ -15,7 +15,7 @@ trait HasFields
     protected $fields = [];
     /** @var string[] */
     protected $fieldsAliases = [];
-    protected $generalSearch = [];
+    protected $generalSearch = ['fields' => [], 'operator' => null];
 
     /**
      * Add a normal/relational field
@@ -83,6 +83,11 @@ trait HasFields
         $this->fields[$field->name] = $field->setCustomSqlRaw($sqlRaw);
 
         return $field;
+    }
+
+    public function addGeneralSearch(array $fields, string $operator = null)
+    {
+        $this->generalSearch = ['fields' => $fields, $operator => $operator];
     }
 
     /**

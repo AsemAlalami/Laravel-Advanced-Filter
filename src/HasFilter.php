@@ -34,21 +34,26 @@ trait HasFilter
      */
     public function scopeFilter(Builder $builder, Request $request = null, Filter $filter = null)
     {
-        return $this->apply($builder, $request);
+        $filterRequest = FilterRequest::createFromRequest($request);
+
+        $builder = $this->apply($builder, $filterRequest);
+
+        $builder = $this->applyGeneralSearch($builder, $filterRequest);
+
+        return $builder;
     }
 
     /**
      * Filter fields from request
      *
      * @param Builder $builder
-     * @param $request
+     * @param FilterRequest $filterRequest
      *
      * @return Builder
      * @throws UnsupportedDriverException
      */
-    private function apply(Builder $builder, $request)
+    private function apply(Builder $builder, FilterRequest $filterRequest)
     {
-        $filterRequest = FilterRequest::createFromRequest($request);
         $conjunction = $filterRequest->getConjunction();
 
         foreach ($filterRequest->getFilters() as $filter) {
@@ -62,26 +67,7 @@ trait HasFilter
                     continue;
                 }
 
-                // apply filter inside relation if the field from relation
-                if ($field->isFromRelation()) {
-                    // apply on custom scope if the relation has scope
-                    if ($this->modelHasScope($builder, $field->getScopeRelationFunctionName())) {
-                        $builder = $builder->{$field->getScopeRelationFunctionName()}($field, $operator, $value, $conjunction);
-                    } else {
-                        if ($builder->getConnection()->getName() == 'mongodb') {
-                            throw new UnsupportedDriverException('MongoDB', 'relational');
-                        }
-
-                        $builder = $builder->has($field->getRelation(), '>=', 1, $conjunction,
-                            function (Builder $builder) use ($field, $value, $operator) {
-                                return $this->filterField($builder, $field, $operator, $value);
-                            }
-                        );
-                    }
-                } else {
-                    // apply on field
-                    $builder = $this->filterField($builder, $field, $operator, $value, $conjunction);
-                }
+                $builder = $this->filterField($builder, $field, $operator, $value, $conjunction);
             }
         }
 
@@ -89,9 +75,72 @@ trait HasFilter
     }
 
     /**
-     * Filter field
+     * Filter general search from the request
      *
-     * check if the field has a custom scope and apply it
+     * @param Builder $builder
+     * @param FilterRequest $filterRequest
+     *
+     * @return Builder
+     * @throws UnsupportedDriverException
+     */
+    private function applyGeneralSearch(Builder $builder, FilterRequest $filterRequest)
+    {
+        if (!empty($filterRequest->getGeneralSearch())) {
+            $operator = $this->generalSearch['operator'] ?: config('advanced_filter.default_general_search_operator');
+
+            $builder->where(function (Builder $builder) use ($filterRequest, $operator) {
+                foreach ($this->generalSearch['fields'] as $fieldName) {
+                    $field = new Field($builder->getModel(), $fieldName);
+
+                    $this->filterField($builder, $field, $operator, $filterRequest->getGeneralSearch());
+                }
+            });
+        }
+
+        return $builder;
+    }
+
+    /**
+     * Filter a field
+     *
+     * @param Builder $builder
+     * @param Field $field
+     * @param $operator
+     * @param $value
+     * @param string $conjunction
+     *
+     * @return Builder
+     * @throws UnsupportedDriverException
+     */
+    private function filterField(Builder $builder, Field $field, $operator, $value, $conjunction = 'and')
+    {
+        // apply the filter inside the relation if the field from relation
+        if ($field->isFromRelation()) {
+            // apply on custom scope if the relation has a scope
+            if ($this->modelHasScope($builder, $field->getScopeRelationFunctionName())) {
+                return $builder->{$field->getScopeRelationFunctionName()}($field, $operator, $value, $conjunction);
+            } else {
+                if ($builder->getConnection()->getName() == 'mongodb') {
+                    throw new UnsupportedDriverException('MongoDB', 'relational');
+                }
+
+                return $builder->has($field->getRelation(), '>=', 1, $conjunction,
+                    function (Builder $builder) use ($field, $value, $operator) {
+                        // consider as a non relation field inside the relation
+                        return $this->filterNonRelationalField($builder, $field, $operator, $value);
+                    }
+                );
+            }
+        } else {
+            // a non relational field
+            return $this->filterNonRelationalField($builder, $field, $operator, $value, $conjunction);
+        }
+    }
+
+    /**
+     * Filter a non relational field
+     *
+     * it checks if the field has a custom scope
      *
      * @param Builder $builder
      * @param Field $field
@@ -101,9 +150,9 @@ trait HasFilter
      *
      * @return mixed
      */
-    private function filterField(Builder $builder, Field $field, $operator, $value, $conjunction = 'and')
+    private function filterNonRelationalField(Builder $builder, Field $field, $operator, $value, $conjunction = 'and')
     {
-        // apply on custom scope if the field has scope
+        // apply on custom scope if the field has a scope
         if ($this->modelHasScope($builder, $field->getScopeFunctionName())) {
             return $builder->{$field->getScopeFunctionName()}($field, $operator, $value, $conjunction);
         }
