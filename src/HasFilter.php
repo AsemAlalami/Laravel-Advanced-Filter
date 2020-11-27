@@ -13,7 +13,7 @@ use Illuminate\Http\Request;
  * Trait HasFilter
  * @package AsemAlalami\LaravelAdvancedFilter
  *
- * @method Builder|$this filter(Request|array $request = null, Filter $filter = null)
+ * @method static Builder|static filter(Request|array $request = null, Filter $filter = null)
  * @see HasFilter::scopeFilter
  */
 trait HasFilter
@@ -26,12 +26,13 @@ trait HasFilter
      * Filter By request
      *
      * @param Builder $builder
-     * @param Request|array|null $request
+     * @param Request|null $request
      * @param Filter|null $filter
      *
      * @return Builder
+     * @throws UnsupportedDriverException
      */
-    public function scopeFilter(Builder $builder, $request = null, Filter $filter = null)
+    public function scopeFilter(Builder $builder, Request $request = null, Filter $filter = null)
     {
         return $this->apply($builder, $request);
     }
@@ -43,6 +44,7 @@ trait HasFilter
      * @param $request
      *
      * @return Builder
+     * @throws UnsupportedDriverException
      */
     private function apply(Builder $builder, $request)
     {

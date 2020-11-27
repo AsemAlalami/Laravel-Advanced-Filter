@@ -24,6 +24,7 @@ These default config file that will be published:
 ## Usage
 - use `HasFilter` trait in the model
 - add fields in the implementation of the abstract function `setupFilter`
+- call `filter` scope in your controller
 ```php
 class Order extends Model
 {
@@ -68,6 +69,16 @@ class Order extends Model
         
         // default behavior
         return $builder->applyOperator($operator, $field, $value, $conjunction);
+    }
+}
+
+...
+
+class OrderController extends Controller
+{
+    public function index()
+    {
+        return Order::filter()->paginate(); // you can pass your custom request
     }
 }
 ```

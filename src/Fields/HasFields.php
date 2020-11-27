@@ -4,6 +4,7 @@
 namespace AsemAlalami\LaravelAdvancedFilter\Fields;
 
 
+use AsemAlalami\LaravelAdvancedFilter\Exceptions\DatatypeNotFoundException;
 use Illuminate\Support\Str;
 
 trait HasFields
@@ -14,9 +15,11 @@ trait HasFields
     protected $fields = [];
     /** @var string[] */
     protected $fieldsAliases = [];
-    protected $countFields = [];
+    protected $generalSearch = [];
 
     /**
+     * Add a normal/relational field
+     *
      * @param string $field
      * @param string|null $alias
      * @param bool|null $inRelation
@@ -32,6 +35,13 @@ trait HasFields
         return $field;
     }
 
+    /**
+     * Add normal/relational fields
+     *
+     * @param $fields
+     *
+     * @return FieldsFactory
+     */
     public function addFields($fields)
     {
         $fieldFactory = new FieldsFactory($this, $fields);
@@ -41,6 +51,15 @@ trait HasFields
         return $fieldFactory;
     }
 
+    /**
+     * Add a count field
+     *
+     * @param string $relation
+     * @param string|null $alias
+     * @param callable|null $callback
+     *
+     * @throws DatatypeNotFoundException
+     */
     public function addCountField(string $relation, string $alias = null, callable $callback = null)
     {
         $field = new Field($this, "{$relation}.", $alias ?: $this->getCountFieldAlias($relation));
@@ -48,6 +67,15 @@ trait HasFields
         $this->fields[$field->name] = $field->setDatatype('numeric')->setCountCallback($callback);
     }
 
+    /**
+     * Add a custom field
+     *
+     * @param string $alias
+     * @param string $sqlRaw
+     * @param null $relation
+     *
+     * @return Field
+     */
     public function addCustomField(string $alias, string $sqlRaw, $relation = null)
     {
         $field = new Field($this, $relation ? "{$relation}.{$alias}" : $alias, $alias);
@@ -57,6 +85,11 @@ trait HasFields
         return $field;
     }
 
+    /**
+     * Resolve factories fields and set fields aliases
+     *
+     * @throws DatatypeNotFoundException
+     */
     private function resolveFields()
     {
         // add fields from factories to fields
@@ -75,9 +108,11 @@ trait HasFields
     }
 
     /**
+     * Determined if the alias exists in filterable fields
+     *
      * @param string $alias
      *
-     * @return Field|bool
+     * @return Field|bool <FALSE> the alias does not exist
      */
     protected function getFilterableField(string $alias)
     {
@@ -88,6 +123,13 @@ trait HasFields
         return false;
     }
 
+    /**
+     * Get default alias for count field from a relation
+     *
+     * @param string $relation
+     *
+     * @return string
+     */
     private function getCountFieldAlias(string $relation)
     {
         return Str::snake($relation) . '_count';
