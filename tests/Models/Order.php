@@ -62,5 +62,7 @@ class Order extends BaseModel
         $this->addField('orderLines.product_id', 'product_id');
         $this->addField('orderLines.product.name', 'product_name');
         $this->addField('orderLines.product.sku', 'product_sku');
+
+        $this->addGeneralSearch(['reference', 'orderLines.product.sku']);
     }
 }

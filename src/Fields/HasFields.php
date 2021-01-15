@@ -87,7 +87,7 @@ trait HasFields
 
     public function addGeneralSearch(array $fields, string $operator = null)
     {
-        $this->generalSearch = ['fields' => $fields, $operator => $operator];
+        $this->generalSearch = ['fields' => $fields, 'operator' => $operator];
     }
 
     /**

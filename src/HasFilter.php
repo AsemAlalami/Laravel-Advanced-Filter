@@ -92,7 +92,7 @@ trait HasFilter
                 foreach ($this->generalSearch['fields'] as $fieldName) {
                     $field = new Field($builder->getModel(), $fieldName);
 
-                    $this->filterField($builder, $field, $operator, $filterRequest->getGeneralSearch());
+                    $this->filterField($builder, $field, $operator, $filterRequest->getGeneralSearch(), 'or');
                 }
             });
         }

@@ -51,10 +51,13 @@ class Order extends Model
         $this->addFields(['source', 'subsource', 'order_date']);
         // field from relation
         $this->addFields(['channel.created_at' => 'channel_create'])->setDatatype('date');
+        $this->addField('orderLines.product.sku', 'product_sku');
         // field from relation count
         $this->addCountField('orderLines');
         // custom field (raw sql)
         $this->addCustomField('my_total', '(shipping_cost + subtotal)');
+        // enable general search
+        $this->addGeneralSearch(['source', 'orderLines.product.sku'], 'startsWith');
     }
 
     // customize field filter by custom scope
@@ -166,6 +169,12 @@ You can add fields to a model by using 4 functions:
     $this->addCustomField('my_total', '(`shipping_cost` + `subtotal`)');
     $this->addCustomField('line_subtotal', '(`price` + `quantity`)', 'orderLines'); // inside "orderLines" relation
     ```
+
+## General Search
+You can enable general search on some fields, and you can specify the operator (`startsWith` is the default operator)
+```php
+$this->addGeneralSearch(['source', 'orderLines.product.sku'], 'startsWith');
+```
 
 ## Conjunction
 Currently, the package support one conjunction between all fields
